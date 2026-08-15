@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "812967524095",
+    "project_id": "tracker-981b2",
+    "storage_bucket": "tracker-981b2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:812967524095:android:84311da9283a1b5032beca",
+        "android_client_info": {
+          "package_name": "com.flowtracker.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCop22iM7IeZaBInfb_LlL9zlsQpeeG_BY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
