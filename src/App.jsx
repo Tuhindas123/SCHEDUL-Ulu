@@ -1,29 +1,77 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { App as CapApp } from "@capacitor/app";
+import { Browser } from "@capacitor/browser";
+import { Capacitor } from "@capacitor/core";
+import { supabase } from "@/lib/supabaseClient";
 
-import Home from "@/pages/Home";
-import Schedule from "@/pages/Schedule";
-import Attendance from "@/pages/Attendance";
-import WeeklyPlan from "@/pages/WeeklyPlan";
-import SettingsPage from "@/pages/Settings";
-import Login from "@/pages/Login";
-
-import PageNotFound from "@/lib/PageNotFound";
-import ScrollToTop from "@/components/ScrollToTop";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import Login from "./pages/Login";
+import Home from "./pages/Home";
+import Attendance from "./pages/Attendance";
+import Schedule from "./pages/Schedule";
+import Settings from "./pages/Settings";
+import WeeklyPlan from "./pages/WeeklyPlan";
 
 function App() {
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // 1. Fetch initial session (Works on BOTH Web and Android)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    // 2. Listen for auth changes (Handles web redirects & logins automatically)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    // 3. Deep Link Listener (ONLY runs on Android/iOS native app)
+    let nativeListener = null;
+    if (Capacitor.isNativePlatform()) {
+      nativeListener = CapApp.addListener("appUrlOpen", async ({ url }) => {
+        if (!url.includes("login-callback")) return;
+        try { await Browser.close(); } catch (e) { /* Ignore browser close error */ }
+        const hash = url.split("#")[1];
+        if (!hash) return;
+        const params = new URLSearchParams(hash);
+        const access_token = params.get("access_token");
+        const refresh_token = params.get("refresh_token");
+        if (access_token && refresh_token) {
+          await supabase.auth.setSession({ access_token, refresh_token });
+        }
+      });
+    }
+
+    return () => {
+      subscription.unsubscribe();
+      if (nativeListener) {
+        nativeListener.then((l) => l?.remove());
+      }
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <Router>
-      <ScrollToTop />
-
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-        <Route path="/schedule" element={<ProtectedRoute><Schedule /></ProtectedRoute>} />
-        <Route path="/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
-        <Route path="/plan" element={<ProtectedRoute><WeeklyPlan /></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-        <Route path="*" element={<PageNotFound />} />
+        <Route path="/login" element={!session ? <Login /> : <Navigate to="/" />} />
+        <Route path="/" element={session ? <Home /> : <Navigate to="/login" />} />
+        <Route path="/attendance" element={session ? <Attendance /> : <Navigate to="/login" />} />
+        <Route path="/schedule" element={session ? <Schedule /> : <Navigate to="/login" />} />
+        <Route path="/settings" element={session ? <Settings /> : <Navigate to="/login" />} />
+        <Route path="/weekly-plan" element={session ? <WeeklyPlan /> : <Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
   );

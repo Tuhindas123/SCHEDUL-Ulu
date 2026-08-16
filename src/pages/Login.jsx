@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { signIn, fetchUserInfo } from "@/lib/googleAuth";
+import { signInWithGoogle } from "@/lib/supabaseAuth"; // Using your actual file!
 import { LogIn, Loader2, Sparkles } from "lucide-react";
 
 export default function Login() {
@@ -10,12 +10,14 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      const token = await signIn();
-      await fetchUserInfo(token);
-      window.location.href = "/";
+      // This calls the function from your supabaseAuth.js
+      await signInWithGoogle();
+      
+      // Note: We don't manually redirect to "/" here because Supabase 
+      // will automatically refresh the page/app when the login finishes.
     } catch (err) {
-      console.error(err);
-      setError("Google sign-in failed. Please try again.");
+      console.error("Google sign-in error:", err);
+      setError(`Sign-in failed: ${err.message}`);
       setLoading(false);
     }
   };
@@ -31,7 +33,7 @@ export default function Login() {
           Flow Tracker
         </h1>
         <p className="text-sm text-muted-foreground mb-6">
-          Sign in to save your data to your own Google Sheet.
+          Sign in to save your data.
         </p>
 
         {error && (
@@ -52,11 +54,6 @@ export default function Login() {
           )}
           {loading ? "Signing in..." : "Continue with Google"}
         </button>
-
-        <p className="text-[11px] text-muted-foreground mt-6">
-          Your data is stored only in a Google Sheet on your own Drive.
-          Nothing goes to any other server.
-        </p>
       </div>
     </div>
   );

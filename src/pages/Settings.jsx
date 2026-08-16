@@ -2,17 +2,21 @@ import React, { useEffect, useState } from "react";
 import { LogOut, User, Percent, Info } from "lucide-react";
 
 import AppShell from "@/components/layout/AppShell";
+import ExportButton from "@/components/settings/ExportButton";
 import { api } from "@/api/apiClient";
-import { signOut, getStoredUser } from "@/lib/googleAuth";
+import { signOut, getSession, getStoredUser } from "@/lib/supabaseAuth";
 
 export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [requiredPct, setRequiredPct] = useState(75);
-  const user = getStoredUser();
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const load = async () => {
       try {
+        const session = await getSession();
+        setUser(getStoredUser(session));
+
         const settings = await api.getSyncSettings();
         setRequiredPct(settings?.[0]?.attendance_required_pct ?? 75);
       } catch (error) {
@@ -24,8 +28,8 @@ export default function Settings() {
     load();
   }, []);
 
-  const handleLogout = () => {
-    signOut();
+  const handleLogout = async () => {
+    await signOut();
     window.location.href = "/login";
   };
 
@@ -69,13 +73,25 @@ export default function Settings() {
             </div>
           </div>
 
+          {/* Data export */}
+          <div className="rounded-3xl bg-card border border-border/60 shadow-sm p-5">
+            <h2 className="text-sm font-semibold text-muted-foreground mb-1">Your data</h2>
+            <p className="text-xs text-muted-foreground mb-3">
+              Download everything as a spreadsheet — one tab each for
+              Schedule, Attendance, and Weekly Plan.
+            </p>
+            <ExportButton className="w-full" />
+          </div>
+
           {/* About */}
           <div className="rounded-3xl bg-card border border-border/60 shadow-sm p-5">
             <div className="flex items-center gap-2 mb-1">
               <Info className="w-4 h-4 text-violet-500" />
               <h2 className="text-sm font-semibold text-muted-foreground">About</h2>
             </div>
-            <p className="text-xs text-muted-foreground">Flow Tracker · v1.0</p>
+            <p className="text-xs text-muted-foreground">
+              Flow Tracker · v1.0 · synced via Supabase across web &amp; app
+            </p>
           </div>
 
           {/* Logout */}

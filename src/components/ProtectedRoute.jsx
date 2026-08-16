@@ -1,19 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { getToken, getStoredUser } from "@/lib/googleAuth";
+import { getSession, onAuthStateChange } from "@/lib/supabaseAuth";
 
 export default function ProtectedRoute({ children }) {
   const [checked, setChecked] = useState(false);
   const [ok, setOk] = useState(false);
 
   useEffect(() => {
-    const token = getToken();
-    const user = getStoredUser();
-    if (token && user) {
-      setOk(true);
-    } else {
-      window.location.href = "/login";
-    }
-    setChecked(true);
+    let active = true;
+
+    getSession().then((session) => {
+      if (!active) return;
+      if (session) {
+        setOk(true);
+      } else {
+        window.location.href = "/login";
+      }
+      setChecked(true);
+    });
+
+    const unsubscribe = onAuthStateChange((session) => {
+      if (!session) {
+        window.location.href = "/login";
+      }
+    });
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, []);
 
   if (!checked) {
