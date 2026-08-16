@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { App as CapApp } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
 import { Capacitor } from "@capacitor/core";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "./lib/supabaseClient";
+
 
 import Login from "./pages/Login";
 import Home from "./pages/Home";
