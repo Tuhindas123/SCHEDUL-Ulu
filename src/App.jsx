@@ -12,6 +12,9 @@ import Schedule from "./pages/Schedule";
 import Settings from "./pages/Settings";
 import WeeklyPlan from "./pages/WeeklyPlan";
 
+// Determine the correct base path depending on the host
+const routerBase = import.meta.env.VITE_HOST_ENV === 'cloudflare' ? '/' : '/flow-tracker';
+
 function App() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -63,7 +66,8 @@ function App() {
   }
 
   return (
-    <Router>
+    // Apply the smart base path here
+    <Router basename={routerBase}>
       <Routes>
         <Route path="/login" element={!session ? <Login /> : <Navigate to="/" />} />
         <Route path="/" element={session ? <Home /> : <Navigate to="/login" />} />
@@ -78,6 +82,3 @@ function App() {
 }
 
 export default App;
-
-
-#hello
