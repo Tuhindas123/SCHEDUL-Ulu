@@ -1,8 +1,14 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
 
 export default defineConfig({
+  base: "/flow-tracker/",   // ← add this line, matching your repo name exactly
   plugins: [react()],
-  // If Cloudflare is building, use '/', otherwise use GitHub's sub-folder path
-  base: process.env.CF_PAGES ? '/' : '/flow-tracker/', 
-})
+
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+});
