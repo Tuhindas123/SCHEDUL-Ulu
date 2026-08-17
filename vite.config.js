@@ -3,11 +3,6 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 
 export default defineConfig({
-  plugins: [react()],
-  base: '/flow-tracker/',
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
+  base: './', // <-- Change this from '/flow-tracker/' to './'
+  plugins: [react()], // or vue(), etc.
 })

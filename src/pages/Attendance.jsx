@@ -326,15 +326,18 @@ function AttForm({ sessions, onClose, onSaved }) {
     try {
       setSaving(true);
 
-      await api.createAttendanceRecord(form);
+      // FIX: Clean up the data before sending it to the API
+      // If class_session_id is an empty string, convert it to null so the database accepts it
+      const payload = {
+        ...form,
+        class_session_id: form.class_session_id === "" ? null : form.class_session_id,
+      };
+
+      await api.createAttendanceRecord(payload);
 
       onSaved();
     } catch (error) {
-      console.error(
-        "Failed to create attendance record:",
-        error
-      );
-
+      console.error("Failed to create attendance record:", error);
       alert("Failed to save attendance record.");
     } finally {
       setSaving(false);
