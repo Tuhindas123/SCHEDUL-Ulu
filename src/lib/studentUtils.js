@@ -103,3 +103,14 @@ export function nextSession(sessions, from = new Date()) {
   }
   return null;
 }
+export function subjectKeyFor(record) {
+  return record.class_session_id
+    ? String(record.class_session_id)
+    : `title:${record.session_title || "Untitled"}`;
+}
+
+export function attendanceStatus(pct, required = 75) {
+  if (pct >= required) return { tone: "good", label: "On track" };
+  if (pct >= required - 5) return { tone: "warning", label: "Watch out" };
+  return { tone: "danger", label: "At risk" };
+}

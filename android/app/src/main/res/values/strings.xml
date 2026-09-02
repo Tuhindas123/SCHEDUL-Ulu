@@ -5,4 +5,5 @@
     <string name="package_name">com.flowtracker.app</string>
     <string name="custom_url_scheme">com.flowtracker.app</string>
     <string name="server_client_id">105526018528-snp4pnkfoqi3er3cp0veeti3ekgl7ugd.apps.googleusercontent.com</string>
+
 </resources>

@@ -6,14 +6,19 @@ export async function signInWithGoogle() {
   const isNative = Capacitor.isNativePlatform();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: isNative
-        ? "com.flowtracker.app://login-callback"
-        : window.location.origin + "/",
-      skipBrowserRedirect: isNative,
+  provider: "google",
+  options: {
+    redirectTo: isNative
+      ? "com.flowtracker.app://login-callback"
+      : window.location.origin + "/",
+    skipBrowserRedirect: isNative,
+    scopes: "https://www.googleapis.com/auth/drive.file",
+    queryParams: {
+      access_type: "offline",
+      prompt: "consent",
     },
-  });
+  },
+});
   if (error) throw error;
 
   if (isNative && data?.url) {

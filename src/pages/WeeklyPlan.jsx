@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Trash2, X, Check, Circle, Loader2, SkipForward } from "lucide-react";
+import React, { useEffect, useState, useMemo } from "react";
+import { Trash2, X, Check, Circle, Loader2, SkipForward, ChevronLeft, ChevronRight } from "lucide-react";
 import { api } from "@/api/apiClient";
 import AppShell from "@/components/layout/AppShell";
 import { toDateString, getWeekStart } from "@/lib/studentUtils";
@@ -26,11 +26,141 @@ const PRIORITY_CHIP = {
   high: "bg-rose-100 text-rose-700",
 };
 
+const PRIORITY_DOT = {
+  low: "bg-slate-400",
+  medium: "bg-amber-500",
+  high: "bg-rose-500",
+};
+
+function eventDateFor(plan) {
+  return plan.due_date || plan.week_start_date || null;
+}
+
+function getMonthMatrix(year, month) {
+  const firstDay = new Date(year, month, 1);
+  const startDate = new Date(firstDay);
+  startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+  const days = [];
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(startDate);
+    d.setDate(startDate.getDate() + i);
+    days.push(d);
+  }
+  return days;
+}
+
+const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function MonthCalendar({ plans, currentMonth, onMonthChange, selectedDate, onSelectDate }) {
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+  const days = useMemo(() => getMonthMatrix(year, month), [year, month]);
+
+  const plansByDate = useMemo(() => {
+    const map = {};
+    for (const plan of plans) {
+      const key = eventDateFor(plan);
+      if (!key) continue;
+      if (!map[key]) map[key] = [];
+      map[key].push(plan);
+    }
+    return map;
+  }, [plans]);
+
+  const todayStr = toDateString(new Date());
+
+  return (
+    <div className="rounded-3xl bg-card border border-border/60 shadow-sm p-5">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-semibold text-foreground">
+          {currentMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+        </h2>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => onMonthChange(new Date(year, month - 1, 1))}
+            className="p-1.5 rounded-xl hover:bg-muted transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => onMonthChange(new Date())}
+            className="px-2.5 py-1 rounded-xl text-xs font-medium hover:bg-muted transition-colors"
+          >
+            Today
+          </button>
+          <button
+            onClick={() => onMonthChange(new Date(year, month + 1, 1))}
+            className="p-1.5 rounded-xl hover:bg-muted transition-colors"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-7 gap-1 mb-1">
+        {WEEKDAY_LABELS.map((label) => (
+          <div key={label} className="text-center text-[11px] font-medium text-muted-foreground py-1">
+            {label}
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-7 gap-1">
+        {days.map((day, idx) => {
+          const dateStr = toDateString(day);
+          const inMonth = day.getMonth() === month;
+          const isToday = dateStr === todayStr;
+          const isSelected = dateStr === selectedDate;
+          const dayPlans = plansByDate[dateStr] || [];
+
+          return (
+            <button
+              key={idx}
+              onClick={() => onSelectDate(isSelected ? null : dateStr)}
+              className={`relative aspect-square rounded-xl flex flex-col items-center justify-start pt-1.5 gap-1 transition-colors ${
+                isSelected
+                  ? "bg-violet-500 text-white"
+                  : isToday
+                  ? "bg-violet-100 text-violet-700"
+                  : inMonth
+                  ? "hover:bg-[hsl(var(--muted))] text-foreground"
+                  : "text-muted-foreground/40 hover:bg-[hsl(var(--muted))]"
+              }`}
+            >
+              <span className="text-xs font-medium">{day.getDate()}</span>
+              {dayPlans.length > 0 && (
+                <div className="flex gap-0.5 flex-wrap justify-center px-0.5">
+                  {dayPlans.slice(0, 3).map((p) => (
+                    <span
+                      key={p.id}
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        isSelected ? "bg-white" : PRIORITY_DOT[p.priority] || PRIORITY_DOT.medium
+                      }`}
+                    />
+                  ))}
+                  {dayPlans.length > 3 && (
+                    <span className={`text-[9px] leading-none ${isSelected ? "text-white" : "text-muted-foreground"}`}>
+                      +{dayPlans.length - 3}
+                    </span>
+                  )}
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function WeeklyPlan() {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const load = async () => {
     try {
@@ -48,8 +178,12 @@ export default function WeeklyPlan() {
     load();
   }, []);
 
+  const dateFiltered = selectedDate
+    ? plans.filter((p) => eventDateFor(p) === selectedDate)
+    : plans;
+
   const filtered =
-    filter === "all" ? plans : plans.filter((p) => p.status === filter);
+    filter === "all" ? dateFiltered : dateFiltered.filter((p) => p.status === filter);
 
   const handleDelete = async (id) => {
     try {
@@ -76,9 +210,9 @@ export default function WeeklyPlan() {
       <div className="space-y-6">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-foreground">Weekly Plan</h1>
+            <h1 className="text-2xl font-semibold text-foreground">Planner</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Track what you plan to do this week.
+              See what's coming up, laid out on the calendar.
             </p>
           </div>
 
@@ -97,32 +231,52 @@ export default function WeeklyPlan() {
           </div>
         ) : (
           <>
-            <div className="flex gap-2 mb-3 flex-wrap">
-              {[
-                ["all", "All"],
-                ["planned", "Planned"],
-                ["in_progress", "In progress"],
-                ["done", "Done"],
-                ["skipped", "Skipped"],
-              ].map(([key, label]) => (
+            <MonthCalendar
+              plans={plans}
+              currentMonth={currentMonth}
+              onMonthChange={setCurrentMonth}
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+            />
+
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex gap-2 flex-wrap">
+                {[
+                  ["all", "All"],
+                  ["planned", "Planned"],
+                  ["in_progress", "In progress"],
+                  ["done", "Done"],
+                  ["skipped", "Skipped"],
+                ].map(([key, label]) => (
+                  <button
+                    key={key}
+                    onClick={() => setFilter(key)}
+                    className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                      filter === key
+                        ? "bg-violet-500 text-white"
+                        : "bg-card border border-border/60 text-muted-foreground hover:bg-[hsl(var(--muted))]"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {selectedDate && (
                 <button
-                  key={key}
-                  onClick={() => setFilter(key)}
-                  className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                    filter === key
-                      ? "bg-violet-500 text-white"
-                      : "bg-card border border-border/60 text-muted-foreground hover:bg-[hsl(var(--muted))]"
-                  }`}
+                  onClick={() => setSelectedDate(null)}
+                  className="text-xs text-violet-600 font-medium hover:underline"
                 >
-                  {label}
+                  Showing {new Date(selectedDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · clear
                 </button>
-              ))}
+              )}
             </div>
 
             <div className="rounded-3xl bg-card border border-border/60 shadow-sm divide-y divide-border/40">
               {filtered.length === 0 ? (
                 <p className="text-sm text-muted-foreground py-10 text-center">
-                  No plans {filter !== "all" ? `for "${filter}"` : ""} yet.
+                  No plans {filter !== "all" ? `for "${filter}"` : ""}
+                  {selectedDate ? " on this day" : ""}.
                 </p>
               ) : (
                 filtered.map((plan) => {
@@ -203,6 +357,7 @@ export default function WeeklyPlan() {
 
         {showForm && (
           <PlanForm
+            defaultDate={selectedDate}
             onClose={() => setShowForm(false)}
             onSaved={() => {
               setShowForm(false);
@@ -215,14 +370,14 @@ export default function WeeklyPlan() {
   );
 }
 
-function PlanForm({ onClose, onSaved }) {
+function PlanForm({ onClose, onSaved, defaultDate }) {
   const [form, setForm] = useState({
     title: "",
     description: "",
     week_start_date: toDateString(getWeekStart()),
     category: "study",
     status: "planned",
-    due_date: "",
+    due_date: defaultDate || "",
     priority: "medium",
   });
 
@@ -240,7 +395,10 @@ function PlanForm({ onClose, onSaved }) {
 
     try {
       setSaving(true);
-      await api.createWeeklyPlan(form);
+      await api.createWeeklyPlan({
+        ...form,
+        due_date: form.due_date || null,
+      });
       onSaved();
     } catch (error) {
       console.error("Failed to create plan:", error);
@@ -256,7 +414,7 @@ function PlanForm({ onClose, onSaved }) {
         <div className="flex items-center justify-between p-6 border-b border-border">
           <div>
             <h2 className="text-lg font-semibold text-foreground">New plan</h2>
-            <p className="text-sm text-muted-foreground mt-1">Add an item to your weekly plan.</p>
+            <p className="text-sm text-muted-foreground mt-1">Add an item to your planner.</p>
           </div>
 
           <button

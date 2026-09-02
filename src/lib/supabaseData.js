@@ -5,6 +5,7 @@ const TABLES = {
   AttendanceRecord: "attendance_records",
   WeeklyPlan: "weekly_plans",
   SyncSetting: "sync_settings",
+  Subject: "subjects",
 };
 
 async function currentUserId() {
@@ -67,3 +68,4 @@ function subscribeToTable(entity, onChange) {
 }
 
 export const supabaseData = { listRows, createRow, updateRow, deleteRow, subscribeToTable };
+

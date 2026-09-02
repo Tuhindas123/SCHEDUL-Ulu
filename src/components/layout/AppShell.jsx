@@ -6,7 +6,7 @@ const NAV = [
   { to: "/", label: "Home", icon: LayoutDashboard, end: true },
   { to: "/schedule", label: "Schedule", icon: CalendarDays },
   { to: "/attendance", label: "Attend", icon: CheckSquare },
-  { to: "/plan", label: "Plan", icon: ListTodo },
+  { to: "/weekly-plan", label: "Plan", icon: ListTodo },
   { to: "/settings", label: "Settings", icon: Settings }
 ];
 
