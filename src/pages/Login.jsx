@@ -25,7 +25,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--background))] p-4">
       <div className="w-full max-w-sm rounded-3xl bg-card border border-border shadow-xl p-8 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-violet-500 text-white grid place-items-center mx-auto mb-4 shadow-lg shadow-violet-500/30">
+        <div className="w-14 h-14 rounded-2xl bg-pink-500 text-white grid place-items-center mx-auto mb-4 shadow-lg shadow-pink-500/30">
           <Sparkles className="w-7 h-7" />
         </div>
 

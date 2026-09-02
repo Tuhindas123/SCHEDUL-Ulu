@@ -207,7 +207,7 @@ export default function ExportButton({ className = "" }) {
         <button
           onClick={handleDriveUpload}
           disabled={uploading}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl bg-violet-500 text-white font-medium hover:bg-violet-600 disabled:opacity-50 transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl bg-pink-500 text-white font-medium hover:bg-pink-600 disabled:opacity-50 transition-colors"
         >
           {uploading ? (
             <Loader2 className="w-4 h-4 animate-spin" />

@@ -8,7 +8,7 @@ export default function SubjectManager({ subjects, onSubjectsChange, onClose }) 
   const [deletingId, setDeletingId] = useState(null);
 
   const inputCls =
-    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400";
+    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400";
 
   const handleAdd = async () => {
     const name = newName.trim();
@@ -68,7 +68,7 @@ export default function SubjectManager({ subjects, onSubjectsChange, onClose }) 
               type="button"
               onClick={handleAdd}
               disabled={saving}
-              className="px-4 rounded-2xl bg-violet-500 text-white text-sm font-medium hover:bg-violet-600 disabled:opacity-50 transition-colors"
+              className="px-4 rounded-2xl bg-pink-500 text-white text-sm font-medium hover:bg-pink-600 disabled:opacity-50 transition-colors"
             >
               {saving ? "…" : "Add"}
             </button>

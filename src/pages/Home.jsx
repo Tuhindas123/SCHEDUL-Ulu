@@ -70,7 +70,7 @@ export default function Home() {
     return (
       <AppShell>
         <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="w-8 h-8 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
         </div>
       </AppShell>
     );
@@ -104,7 +104,7 @@ export default function Home() {
             icon={CalendarDays}
             label="Today's classes"
             value={todaySessions.length}
-            tone="violet"
+            tone="blue"
           />
 
           <StatCard
@@ -120,7 +120,7 @@ export default function Home() {
             label="This week's plans"
             value={plans.filter((p) => p.status !== "done").length}
             sub={`${plans.filter((p) => p.status === "done").length} done`}
-            tone="amber"
+            tone="yellow"
           />
 
           <StatCard
@@ -128,7 +128,7 @@ export default function Home() {
             label="Up next"
             value={next ? formatTime(next.start_time) : "—"}
             sub={next ? next.title : "Free time!"}
-            tone="coral"
+            tone="pink"
           />
         </div>
 
@@ -196,7 +196,7 @@ export default function Home() {
 
             <Link
               to="/schedule"
-              className="block rounded-3xl bg-violet-500 text-white p-5 shadow-lg shadow-violet-500/25 hover:bg-violet-600 transition-colors"
+              className="block rounded-3xl bg-pink-500 text-white p-5 shadow-lg shadow-pink-500/25 hover:bg-pink-600 transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -204,7 +204,7 @@ export default function Home() {
                     See full week
                   </p>
 
-                  <p className="text-sm text-violet-100">
+                  <p className="text-sm text-pink-100">
                     All your sessions at a glance
                   </p>
                 </div>

@@ -1,0 +1,805 @@
+diff --git a/index.html b/index.html
+index 8c97be1..f996911 100644
+--- a/index.html
++++ b/index.html
+@@ -5,6 +5,9 @@
+     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <link rel="manifest" href="./manifest.json" />
++    <link rel="preconnect" href="https://fonts.googleapis.com" />
++    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
++    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+     <title>Base44 APP</title>
+     <!-- PWA Manifest Link -->
+     <link rel="manifest" href="./manifest.json" />
+diff --git a/src/components/ProtectedRoute.jsx b/src/components/ProtectedRoute.jsx
+index 33c1873..c294598 100644
+--- a/src/components/ProtectedRoute.jsx
++++ b/src/components/ProtectedRoute.jsx
+@@ -33,7 +33,7 @@ export default function ProtectedRoute({ children }) {
+   if (!checked) {
+     return (
+       <div className="min-h-screen flex items-center justify-center">
+-        <div className="w-8 h-8 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
++        <div className="w-8 h-8 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
+       </div>
+     );
+   }
+diff --git a/src/components/attendance/LogEntryForm.jsx b/src/components/attendance/LogEntryForm.jsx
+index d01dea9..3135f97 100644
+--- a/src/components/attendance/LogEntryForm.jsx
++++ b/src/components/attendance/LogEntryForm.jsx
+@@ -23,7 +23,7 @@ export default function LogEntryForm({ sessions, initial, onClose, onSaved }) {
+   const [saving, setSaving] = useState(false);
+ 
+   const inputCls =
+-    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 disabled:opacity-60";
++    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 disabled:opacity-60";
+ 
+   const submit = async (event) => {
+     event.preventDefault();
+@@ -138,7 +138,7 @@ export default function LogEntryForm({ sessions, initial, onClose, onSaved }) {
+             <button
+               type="submit"
+               disabled={saving}
+-              className="px-4 py-2.5 rounded-2xl bg-violet-500 text-white text-sm font-medium hover:bg-violet-600 disabled:opacity-50 transition-colors"
++              className="px-4 py-2.5 rounded-2xl bg-pink-500 text-white text-sm font-medium hover:bg-pink-600 disabled:opacity-50 transition-colors"
+             >
+               {saving ? "Saving…" : "Add entry"}
+             </button>
+diff --git a/src/components/dashboard/AttendanceRing.jsx b/src/components/dashboard/AttendanceRing.jsx
+index 0737298..975d53d 100644
+--- a/src/components/dashboard/AttendanceRing.jsx
++++ b/src/components/dashboard/AttendanceRing.jsx
+@@ -4,16 +4,18 @@ export default function AttendanceRing({ pct, required = 75 }) {
+   const r = 70;
+   const c = 2 * Math.PI * r;
+   const offset = c - (pct / 100) * c;
+-  const statusColor = pct >= required ? "#14b8a6" : pct >= required - 5 ? "#f59e0b" : "#f43f5e";
++  const statusColor = pct >= required ? "#4fae8f" : pct >= required - 5 ? "#e0ac3f" : "#e0637a";
++  const statusBg = pct >= required ? "hsl(var(--pastel-mint))" : pct >= required - 5 ? "hsl(var(--pastel-yellow))" : "hsl(var(--pastel-pink))";
+   const statusLabel = pct >= required ? "On track" : pct >= required - 5 ? "Watch out" : "At risk";
++
+   return (
+-    <div className="rounded-3xl bg-card p-6 border border-border/60 shadow-sm flex flex-col items-center">
++    <div className="rounded-3xl bg-card p-6 border border-border/60 flex flex-col items-center">
+       <h3 className="self-start text-sm font-semibold text-muted-foreground mb-2">Attendance</h3>
+       <div className="relative w-44 h-44">
+         <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
+-          <circle cx="80" cy="80" r={r} fill="none" stroke="#e9e7e0" strokeWidth="14" />
++          <circle cx="80" cy="80" r={r} fill="none" stroke="hsl(var(--muted))" strokeWidth="16" />
+           <circle
+-            cx="80" cy="80" r={r} fill="none" stroke={statusColor} strokeWidth="14"
++            cx="80" cy="80" r={r} fill="none" stroke={statusColor} strokeWidth="16"
+             strokeLinecap="round" strokeDasharray={c} strokeDashoffset={offset}
+             style={{ transition: "stroke-dashoffset 0.8s ease" }}
+           />
+@@ -23,9 +25,12 @@ export default function AttendanceRing({ pct, required = 75 }) {
+           <span className="text-xs text-muted-foreground">of {required}% required</span>
+         </div>
+       </div>
+-      <div className="mt-2 px-3 py-1 rounded-full text-xs font-semibold" style={{ background: `${statusColor}1a`, color: statusColor }}>
++      <div
++        className="mt-2 px-3 py-1 rounded-full text-xs font-semibold"
++        style={{ background: statusBg, color: statusColor }}
++      >
+         {statusLabel}
+       </div>
+     </div>
+   );
+-}
+\ No newline at end of file
++}
+diff --git a/src/components/dashboard/StatCard.jsx b/src/components/dashboard/StatCard.jsx
+index ddf33cb..a71726e 100644
+--- a/src/components/dashboard/StatCard.jsx
++++ b/src/components/dashboard/StatCard.jsx
+@@ -1,25 +1,30 @@
+ import React from "react";
+ 
+-export default function StatCard({ icon: Icon, label, value, sub, tone = "violet" }) {
++export default function StatCard({ icon: Icon, label, value, sub, tone = "pink" }) {
+   const tones = {
+-    violet: "from-violet-500 to-violet-400 text-white shadow-violet-500/30",
+-    coral: "from-rose-500 to-rose-400 text-white shadow-rose-500/30",
+-    mint: "from-teal-500 to-teal-400 text-white shadow-teal-500/30",
+-    amber: "from-amber-500 to-amber-400 text-white shadow-amber-500/30",
+-    sky: "from-sky-500 to-sky-400 text-white shadow-sky-500/30"
++    pink: "bg-pastelPink text-pastelPink-foreground",
++    blue: "bg-pastelBlue text-pastelBlue-foreground",
++    yellow: "bg-pastelYellow text-pastelYellow-foreground",
++    mint: "bg-pastelMint text-pastelMint-foreground",
++    // legacy tone names still used around the app, mapped onto the new palette
++    violet: "bg-pastelBlue text-pastelBlue-foreground",
++    coral: "bg-pastelPink text-pastelPink-foreground",
++    amber: "bg-pastelYellow text-pastelYellow-foreground",
++    sky: "bg-pastelBlue text-pastelBlue-foreground"
+   };
++
+   return (
+-    <div className="rounded-3xl bg-card p-5 border border-border/60 shadow-sm">
+-      <div className="flex items-center gap-3">
+-        <div className={`w-11 h-11 rounded-2xl grid place-items-center bg-gradient-to-br ${tones[tone]} shadow-lg`}>
+-          {Icon && <Icon className="w-5 h-5" />}
+-        </div>
+-        <div className="min-w-0">
+-          <p className="text-[13px] font-medium text-muted-foreground truncate">{label}</p>
+-          <p className="text-2xl font-heading font-bold text-foreground leading-tight">{value}</p>
+-        </div>
++    <div className={`rounded-3xl p-5 ${tones[tone] || tones.pink}`}>
++      <div className="flex items-center justify-between">
++        <p className="text-[13px] font-medium opacity-70 truncate">{label}</p>
++        {Icon && (
++          <div className="w-8 h-8 rounded-xl grid place-items-center bg-white/40 shrink-0">
++            <Icon className="w-4 h-4" />
++          </div>
++        )}
+       </div>
+-      {sub && <p className="mt-3 text-xs text-muted-foreground">{sub}</p>}
++      <p className="text-2xl font-heading font-bold leading-tight mt-2">{value}</p>
++      {sub && <p className="mt-2 text-xs opacity-70">{sub}</p>}
+     </div>
+   );
+-}
+\ No newline at end of file
++}
+diff --git a/src/components/dashboard/SubjectListRow.jsx b/src/components/dashboard/SubjectListRow.jsx
+index 32b54eb..0c6ca26 100644
+--- a/src/components/dashboard/SubjectListRow.jsx
++++ b/src/components/dashboard/SubjectListRow.jsx
+@@ -15,10 +15,10 @@ export default function SubjectListRow({ subjectKey, title, pct, required }) {
+   return (
+     <Link
+       to={`/attendance/${encodeURIComponent(subjectKey)}`}
+-      className="flex items-center justify-between gap-4 rounded-2xl bg-card border border-border/60 shadow-sm p-4 hover:border-violet-200 hover:shadow-md transition-all"
++      className="flex items-center justify-between gap-4 rounded-2xl bg-card border border-border/60 shadow-sm p-4 hover:border-pink-200 hover:shadow-md transition-all"
+     >
+       <div className="flex items-center gap-3 min-w-0">
+-        <div className="w-11 h-11 rounded-2xl bg-violet-100 text-violet-600 grid place-items-center shrink-0">
++        <div className="w-11 h-11 rounded-2xl bg-pink-100 text-pink-600 grid place-items-center shrink-0">
+           <FileText className="w-5 h-5" />
+         </div>
+         <p className="font-medium text-foreground truncate">{title}</p>
+diff --git a/src/components/layout/AppShell.jsx b/src/components/layout/AppShell.jsx
+index 7b9215b..53674b6 100644
+--- a/src/components/layout/AppShell.jsx
++++ b/src/components/layout/AppShell.jsx
+@@ -13,58 +13,80 @@ const NAV = [
+ export default function AppShell({ children }) {
+   return (
+     <div className="min-h-screen bg-[hsl(var(--background))]">
+-      <div className="flex flex-col lg:flex-row max-w-7xl mx-auto">
+-        {/* Sidebar — desktop only */}
+-        <aside className="hidden lg:block lg:w-64 lg:min-h-screen lg:sticky lg:top-0 shrink-0">
+-          <div className="px-6 pt-6 pb-2">
+-            <div className="flex items-center gap-2">
+-              <div className="w-9 h-9 rounded-2xl bg-violet-500 text-white grid place-items-center shadow-lg shadow-violet-500/30">
++      <div className="flex flex-col lg:flex-row max-w-7xl mx-auto lg:gap-6 lg:p-6">
++        {/* Sidebar — desktop only, floats as a dark rounded card like the reference */}
++        <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:min-h-[calc(100vh-3rem)] lg:sticky lg:top-6 shrink-0 rounded-[2rem] bg-sidebar text-sidebar-foreground overflow-hidden">
++          <div className="px-6 pt-7 pb-4">
++            <div className="flex items-center gap-2.5">
++              <div className="w-9 h-9 rounded-2xl bg-pastelPink text-pastelPink-foreground grid place-items-center">
+                 <Sparkles className="w-5 h-5" />
+               </div>
+               <div>
+-                <p className="font-heading font-bold text-foreground leading-tight">Flow Tracker</p>
+-                <p className="text-[11px] text-muted-foreground leading-tight">your week, in colour</p>
++                <p className="font-heading font-bold text-white leading-tight">Flow Tracker</p>
++                <p className="text-[11px] text-sidebar-foreground/60 leading-tight">your week, in colour</p>
+               </div>
+             </div>
+           </div>
+-          <nav className="flex flex-col gap-1 px-4 pb-4 pt-2">
++
++          <p className="px-6 pt-2 pb-2 text-[11px] font-semibold text-sidebar-foreground/40">General</p>
++
++          <nav className="flex flex-col gap-1 px-4 pb-4">
+             {NAV.map(({ to, label, icon: Icon, end }) => (
+               <NavLink
+                 key={to}
+                 to={to}
+                 end={end}
+                 className={({ isActive }) =>
+-                  `flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-sm font-medium whitespace-nowrap transition-all ${
++                  `group flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-2xl text-sm font-medium whitespace-nowrap transition-all ${
+                     isActive
+-                      ? "bg-violet-500 text-white shadow-lg shadow-violet-500/25"
+-                      : "text-muted-foreground hover:bg-violet-100/60 hover:text-violet-700"
++                      ? "bg-white/10 text-white"
++                      : "text-sidebar-foreground/65 hover:bg-white/5 hover:text-white"
+                   }`
+                 }
+               >
+-                <Icon className="w-[18px] h-[18px] shrink-0" />
+-                <span>{label}</span>
++                {({ isActive }) => (
++                  <>
++                    <span className="flex items-center gap-2.5">
++                      <Icon className="w-[18px] h-[18px] shrink-0" />
++                      <span>{label}</span>
++                    </span>
++                    <span
++                      className={`w-1.5 h-1.5 rounded-full bg-pastelPink transition-opacity ${
++                        isActive ? "opacity-100" : "opacity-0"
++                      }`}
++                    />
++                  </>
++                )}
+               </NavLink>
+             ))}
+           </nav>
++
++          <div className="mt-auto p-4">
++            <div className="rounded-2xl bg-white/5 p-4">
++              <p className="text-xs text-sidebar-foreground/60 leading-snug">
++                Keep your attendance on track, one class at a time.
++              </p>
++            </div>
++          </div>
+         </aside>
+ 
+         {/* Mobile top bar — app-like, sticky */}
+         <header className="lg:hidden sticky top-0 z-40 flex items-center gap-2 px-4 py-3 bg-[hsl(var(--background))]/90 backdrop-blur-md border-b border-border/60">
+-          <div className="w-8 h-8 rounded-xl bg-violet-500 text-white grid place-items-center shadow-md shadow-violet-500/30">
++          <div className="w-8 h-8 rounded-xl bg-sidebar text-white grid place-items-center">
+             <Sparkles className="w-4 h-4" />
+           </div>
+           <p className="font-heading font-bold text-foreground text-sm">Flow Tracker</p>
+         </header>
+ 
+         {/* Main */}
+-        <main className="flex-1 min-w-0 px-4 lg:px-8 pb-24 lg:pb-16 pt-4 lg:pt-8">
++        <main className="flex-1 min-w-0 px-4 lg:px-0 pb-24 lg:pb-8 pt-4 lg:pt-0">
+           {children}
+         </main>
+ 
+         {/* Mobile bottom tab bar — app-like */}
+         <nav
+-          className="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-[hsl(var(--background))]/95 backdrop-blur-md border-t border-border/60 flex justify-around"
+-          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
++          className="lg:hidden fixed bottom-3 inset-x-3 z-50 bg-sidebar rounded-3xl flex justify-around px-2 py-1"
++          style={{ paddingBottom: "env(safe-area-inset-bottom, 6px)" }}
+         >
+           {NAV.map(({ to, label, icon: Icon, end }) => (
+             <NavLink
+@@ -73,7 +95,7 @@ export default function AppShell({ children }) {
+               end={end}
+               className={({ isActive }) =>
+                 `flex flex-col items-center justify-center gap-0.5 flex-1 py-2 text-[11px] font-medium transition-colors ${
+-                  isActive ? "text-violet-600" : "text-muted-foreground"
++                  isActive ? "text-white" : "text-sidebar-foreground/50"
+                 }`
+               }
+             >
+@@ -81,7 +103,7 @@ export default function AppShell({ children }) {
+                 <>
+                   <div
+                     className={`w-9 h-6 rounded-full grid place-items-center transition-colors ${
+-                      isActive ? "bg-violet-100" : ""
++                      isActive ? "bg-white/10" : ""
+                     }`}
+                   >
+                     <Icon className="w-[18px] h-[18px]" />
+diff --git a/src/components/settings/ExportButton.jsx b/src/components/settings/ExportButton.jsx
+index 9344217..09ffe73 100644
+--- a/src/components/settings/ExportButton.jsx
++++ b/src/components/settings/ExportButton.jsx
+@@ -207,7 +207,7 @@ export default function ExportButton({ className = "" }) {
+         <button
+           onClick={handleDriveUpload}
+           disabled={uploading}
+-          className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl bg-violet-500 text-white font-medium hover:bg-violet-600 disabled:opacity-50 transition-colors"
++          className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl bg-pink-500 text-white font-medium hover:bg-pink-600 disabled:opacity-50 transition-colors"
+         >
+           {uploading ? (
+             <Loader2 className="w-4 h-4 animate-spin" />
+diff --git a/src/components/shared/DatePicker.jsx b/src/components/shared/DatePicker.jsx
+index 3a22ce8..e6c849d 100644
+--- a/src/components/shared/DatePicker.jsx
++++ b/src/components/shared/DatePicker.jsx
+@@ -44,7 +44,7 @@ export default function DatePicker({ value, onChange }) {
+       <button
+         type="button"
+         onClick={() => setOpen((o) => !o)}
+-        className="w-full flex items-center justify-between rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
++        className="w-full flex items-center justify-between rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+       >
+         <span className="text-foreground">{displayLabel}</span>
+         <CalendarIcon className="w-4 h-4 text-muted-foreground" />
+@@ -57,7 +57,7 @@ export default function DatePicker({ value, onChange }) {
+               type="button"
+               onClick={() => { onChange(todayStr); setOpen(false); }}
+               className={`flex-1 px-2 py-1.5 rounded-xl text-xs font-medium border transition-colors ${
+-                value === todayStr ? "bg-violet-500 text-white border-transparent" : "border-border text-muted-foreground hover:bg-[hsl(var(--muted))]"
++                value === todayStr ? "bg-pink-500 text-white border-transparent" : "border-border text-muted-foreground hover:bg-[hsl(var(--muted))]"
+               }`}
+             >
+               Today
+@@ -66,7 +66,7 @@ export default function DatePicker({ value, onChange }) {
+               type="button"
+               onClick={() => { onChange(yesterdayStr); setOpen(false); }}
+               className={`flex-1 px-2 py-1.5 rounded-xl text-xs font-medium border transition-colors ${
+-                value === yesterdayStr ? "bg-violet-500 text-white border-transparent" : "border-border text-muted-foreground hover:bg-[hsl(var(--muted))]"
++                value === yesterdayStr ? "bg-pink-500 text-white border-transparent" : "border-border text-muted-foreground hover:bg-[hsl(var(--muted))]"
+               }`}
+             >
+               Yesterday
+@@ -115,9 +115,9 @@ export default function DatePicker({ value, onChange }) {
+                   onClick={() => { onChange(dateStr); setOpen(false); }}
+                   className={`aspect-square rounded-lg text-xs transition-colors ${
+                     isSelected
+-                      ? "bg-violet-500 text-white font-semibold"
++                      ? "bg-pink-500 text-white font-semibold"
+                       : isToday
+-                      ? "bg-violet-100 text-violet-700"
++                      ? "bg-pink-100 text-pink-700"
+                       : inMonth
+                       ? "text-foreground hover:bg-[hsl(var(--muted))]"
+                       : "text-muted-foreground/40 hover:bg-[hsl(var(--muted))]"
+diff --git a/src/components/shared/SubjectManager.jsx b/src/components/shared/SubjectManager.jsx
+index 567bff5..0e939dd 100644
+--- a/src/components/shared/SubjectManager.jsx
++++ b/src/components/shared/SubjectManager.jsx
+@@ -8,7 +8,7 @@ export default function SubjectManager({ subjects, onSubjectsChange, onClose })
+   const [deletingId, setDeletingId] = useState(null);
+ 
+   const inputCls =
+-    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400";
++    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400";
+ 
+   const handleAdd = async () => {
+     const name = newName.trim();
+@@ -68,7 +68,7 @@ export default function SubjectManager({ subjects, onSubjectsChange, onClose })
+               type="button"
+               onClick={handleAdd}
+               disabled={saving}
+-              className="px-4 rounded-2xl bg-violet-500 text-white text-sm font-medium hover:bg-violet-600 disabled:opacity-50 transition-colors"
++              className="px-4 rounded-2xl bg-pink-500 text-white text-sm font-medium hover:bg-pink-600 disabled:opacity-50 transition-colors"
+             >
+               {saving ? "…" : "Add"}
+             </button>
+diff --git a/src/index.css b/src/index.css
+index 9a66b18..b963c03 100644
+--- a/src/index.css
++++ b/src/index.css
+@@ -4,43 +4,58 @@
+ 
+ @layer base {
+   :root {
+-    --background: 48 70% 98%;
+-    --foreground: 210 14% 16%;
+-    --card: 0 0% 100%;
+-    --card-foreground: 210 14% 16%;
+-    --popover: 0 0% 100%;
+-    --popover-foreground: 210 14% 16%;
+-    --primary: 258 82% 62%;
+-    --primary-foreground: 0 0% 100%;
+-    --secondary: 48 60% 95%;
+-    --secondary-foreground: 258 82% 42%;
+-    --muted: 48 50% 94%;
+-    --muted-foreground: 210 10% 42%;
+-    --accent: 4 100% 72%;
+-    --accent-foreground: 0 0% 100%;
+-    --destructive: 0 84% 64%;
++    /* Warm cream base, matching a soft paper-like backdrop */
++    --background: 42 46% 95%;
++    --foreground: 240 10% 14%;
++    --card: 40 45% 98%;
++    --card-foreground: 240 10% 14%;
++    --popover: 40 45% 98%;
++    --popover-foreground: 240 10% 14%;
++    /* Near-black primary — used for CTA buttons + sidebar, echoing the reference's black pills */
++    --primary: 240 9% 11%;
++    --primary-foreground: 42 40% 97%;
++    --secondary: 45 48% 92%;
++    --secondary-foreground: 240 8% 16%;
++    --muted: 42 35% 91%;
++    --muted-foreground: 32 9% 44%;
++    /* Soft pink — the recurring highlight accent */
++    --accent: 340 78% 84%;
++    --accent-foreground: 340 45% 24%;
++    --destructive: 3 78% 62%;
+     --destructive-foreground: 0 0% 100%;
+-    --border: 48 40% 90%;
+-    --input: 48 40% 90%;
+-    --ring: 258 82% 62%;
+-    --chart-1: 258 82% 62%;
+-    --chart-2: 179 100% 40%;
+-    --chart-3: 36 97% 64%;
+-    --chart-4: 4 100% 72%;
+-    --chart-5: 200 95% 52%;
+-    --radius: 1.25rem;
+-    --font-heading: ui-sans-serif, system-ui, sans-serif;
+-    --font-body: ui-sans-serif, system-ui, sans-serif;
+-    --font-display: ui-sans-serif, system-ui, sans-serif;
++    --border: 42 28% 87%;
++    --input: 42 28% 87%;
++    --ring: 240 9% 11%;
++    --chart-1: 340 78% 82%;
++    --chart-2: 205 72% 80%;
++    --chart-3: 45 88% 72%;
++    --chart-4: 158 40% 68%;
++    --chart-5: 258 45% 78%;
++    --radius: 1.5rem;
++    --font-heading: "Manrope", ui-sans-serif, system-ui, sans-serif;
++    --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
++    --font-display: "Manrope", ui-sans-serif, system-ui, sans-serif;
+     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+-    --sidebar-background: 0 0% 98%;
+-    --sidebar-foreground: 240 5.3% 26.1%;
+-    --sidebar-primary: 240 5.9% 10%;
+-    --sidebar-primary-foreground: 0 0% 98%;
+-    --sidebar-accent: 240 4.8% 95.9%;
+-    --sidebar-accent-foreground: 240 5.9% 10%;
+-    --sidebar-border: 220 13% 91%;
+-    --sidebar-ring: 217.2 91.2% 59.8%;
++
++    /* Pastel tints for stat cards / tags — soft fill + a darker readable foreground */
++    --pastel-pink: 340 78% 87%;
++    --pastel-pink-foreground: 340 55% 26%;
++    --pastel-blue: 208 72% 85%;
++    --pastel-blue-foreground: 210 55% 26%;
++    --pastel-yellow: 45 88% 78%;
++    --pastel-yellow-foreground: 38 55% 24%;
++    --pastel-mint: 158 42% 82%;
++    --pastel-mint-foreground: 160 45% 22%;
++
++    /* Floating dark sidebar, like the reference's near-black nav card */
++    --sidebar-background: 240 10% 10%;
++    --sidebar-foreground: 42 22% 90%;
++    --sidebar-primary: 340 78% 84%;
++    --sidebar-primary-foreground: 240 10% 12%;
++    --sidebar-accent: 240 8% 16%;
++    --sidebar-accent-foreground: 42 25% 95%;
++    --sidebar-border: 240 8% 18%;
++    --sidebar-ring: 340 78% 84%;
+   }
+ 
+   .dark {
+diff --git a/src/pages/Attendance.jsx b/src/pages/Attendance.jsx
+index 7813771..12eba4d 100644
+--- a/src/pages/Attendance.jsx
++++ b/src/pages/Attendance.jsx
+@@ -38,7 +38,7 @@ function SubjectCard({ title, stats, active, onClick }) {
+     <button
+       onClick={onClick}
+       className={`text-left rounded-2xl border p-4 transition-colors ${
+-        active ? "border-violet-400 bg-violet-50" : "border-border/60 bg-card hover:bg-[hsl(var(--muted))]"
++        active ? "border-pink-400 bg-pink-50" : "border-border/60 bg-card hover:bg-[hsl(var(--muted))]"
+       }`}
+     >
+       <div className="flex items-center justify-between mb-2 gap-2">
+@@ -145,7 +145,7 @@ export default function Attendance() {
+           </div>
+           <button
+             onClick={() => setShowForm(true)}
+-            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-violet-500 text-white font-medium shadow-lg shadow-violet-500/25 hover:bg-violet-600 transition-colors"
++            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-500 text-white font-medium shadow-lg shadow-pink-500/25 hover:bg-pink-600 transition-colors"
+           >
+             <span className="text-lg">+</span>
+             Log entry
+@@ -154,7 +154,7 @@ export default function Attendance() {
+ 
+         {loading ? (
+           <div className="flex justify-center py-20">
+-            <div className="w-8 h-8 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
++            <div className="w-8 h-8 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
+           </div>
+         ) : (
+           <>
+@@ -165,7 +165,7 @@ export default function Attendance() {
+                   <button
+                     onClick={() => setSubjectFilter("all")}
+                     className={`text-left rounded-2xl border p-4 transition-colors ${
+-                      subjectFilter === "all" ? "border-violet-400 bg-violet-50" : "border-border/60 bg-card hover:bg-[hsl(var(--muted))]"
++                      subjectFilter === "all" ? "border-pink-400 bg-pink-50" : "border-border/60 bg-card hover:bg-[hsl(var(--muted))]"
+                     }`}
+                   >
+                     <p className="font-medium text-foreground mb-2">All subjects</p>
+@@ -219,7 +219,7 @@ export default function Attendance() {
+                         key={key}
+                         onClick={() => setFilter(key)}
+                         className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors ${
+-                          filter === key ? "bg-violet-500 text-white" : "bg-card border border-border/60 text-muted-foreground hover:bg-[hsl(var(--muted))]"
++                          filter === key ? "bg-pink-500 text-white" : "bg-card border border-border/60 text-muted-foreground hover:bg-[hsl(var(--muted))]"
+                         }`}
+                       >
+                         {label}
+@@ -227,7 +227,7 @@ export default function Attendance() {
+                     ))}
+                   </div>
+                   {subjectFilter !== "all" && (
+-                    <button onClick={() => setSubjectFilter("all")} className="text-xs text-violet-600 font-medium hover:underline">
++                    <button onClick={() => setSubjectFilter("all")} className="text-xs text-pink-600 font-medium hover:underline">
+                       Clear subject filter
+                     </button>
+                   )}
+@@ -310,7 +310,7 @@ function AttForm({ subjects, onClose, onSaved }) {
+   const [saving, setSaving] = useState(false);
+ 
+   const inputCls =
+-    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400";
++    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400";
+ 
+   const submit = async (event) => {
+     event.preventDefault();
+@@ -394,7 +394,7 @@ function AttForm({ subjects, onClose, onSaved }) {
+             <button
+               type="submit"
+               disabled={saving}
+-              className="px-4 py-2.5 rounded-2xl bg-violet-500 text-white text-sm font-medium hover:bg-violet-600 disabled:opacity-50 transition-colors"
++              className="px-4 py-2.5 rounded-2xl bg-pink-500 text-white text-sm font-medium hover:bg-pink-600 disabled:opacity-50 transition-colors"
+             >
+               {saving ? "Saving…" : "Save entry"}
+             </button>
+diff --git a/src/pages/Home.jsx b/src/pages/Home.jsx
+index aca9b50..631af53 100644
+--- a/src/pages/Home.jsx
++++ b/src/pages/Home.jsx
+@@ -70,7 +70,7 @@ export default function Home() {
+     return (
+       <AppShell>
+         <div className="min-h-[60vh] flex items-center justify-center">
+-          <div className="w-8 h-8 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
++          <div className="w-8 h-8 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
+         </div>
+       </AppShell>
+     );
+@@ -104,7 +104,7 @@ export default function Home() {
+             icon={CalendarDays}
+             label="Today's classes"
+             value={todaySessions.length}
+-            tone="violet"
++            tone="blue"
+           />
+ 
+           <StatCard
+@@ -120,7 +120,7 @@ export default function Home() {
+             label="This week's plans"
+             value={plans.filter((p) => p.status !== "done").length}
+             sub={`${plans.filter((p) => p.status === "done").length} done`}
+-            tone="amber"
++            tone="yellow"
+           />
+ 
+           <StatCard
+@@ -128,7 +128,7 @@ export default function Home() {
+             label="Up next"
+             value={next ? formatTime(next.start_time) : "—"}
+             sub={next ? next.title : "Free time!"}
+-            tone="coral"
++            tone="pink"
+           />
+         </div>
+ 
+@@ -196,7 +196,7 @@ export default function Home() {
+ 
+             <Link
+               to="/schedule"
+-              className="block rounded-3xl bg-violet-500 text-white p-5 shadow-lg shadow-violet-500/25 hover:bg-violet-600 transition-colors"
++              className="block rounded-3xl bg-pink-500 text-white p-5 shadow-lg shadow-pink-500/25 hover:bg-pink-600 transition-colors"
+             >
+               <div className="flex items-center justify-between">
+                 <div>
+@@ -204,7 +204,7 @@ export default function Home() {
+                     See full week
+                   </p>
+ 
+-                  <p className="text-sm text-violet-100">
++                  <p className="text-sm text-pink-100">
+                     All your sessions at a glance
+                   </p>
+                 </div>
+diff --git a/src/pages/Login.jsx b/src/pages/Login.jsx
+index c6af19b..541462b 100644
+--- a/src/pages/Login.jsx
++++ b/src/pages/Login.jsx
+@@ -25,7 +25,7 @@ export default function Login() {
+   return (
+     <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--background))] p-4">
+       <div className="w-full max-w-sm rounded-3xl bg-card border border-border shadow-xl p-8 text-center">
+-        <div className="w-14 h-14 rounded-2xl bg-violet-500 text-white grid place-items-center mx-auto mb-4 shadow-lg shadow-violet-500/30">
++        <div className="w-14 h-14 rounded-2xl bg-pink-500 text-white grid place-items-center mx-auto mb-4 shadow-lg shadow-pink-500/30">
+           <Sparkles className="w-7 h-7" />
+         </div>
+ 
+diff --git a/src/pages/Schedule.jsx b/src/pages/Schedule.jsx
+index 80804af..755e160 100644
+--- a/src/pages/Schedule.jsx
++++ b/src/pages/Schedule.jsx
+@@ -68,7 +68,7 @@ export default function Schedule() {
+             </button>
+             <button
+               onClick={() => setShowForm(true)}
+-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-violet-500 text-white font-medium shadow-lg shadow-violet-500/25 hover:bg-violet-600 transition-colors"
++              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-500 text-white font-medium shadow-lg shadow-pink-500/25 hover:bg-pink-600 transition-colors"
+             >
+               <span className="text-lg">+</span>
+               Add session
+@@ -78,7 +78,7 @@ export default function Schedule() {
+ 
+         {loading ? (
+           <div className="flex justify-center py-20">
+-            <div className="w-8 h-8 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
++            <div className="w-8 h-8 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
+           </div>
+         ) : (
+           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+@@ -180,7 +180,7 @@ function SessionForm({ subjects, onClose, onSaved }) {
+   const [saving, setSaving] = useState(false);
+ 
+   const inputCls =
+-    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400";
++    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400";
+ 
+   const submit = async (event) => {
+     event.preventDefault();
+@@ -312,7 +312,7 @@ function SessionForm({ subjects, onClose, onSaved }) {
+             <button
+               type="submit"
+               disabled={saving}
+-              className="px-4 py-2.5 rounded-2xl bg-violet-500 text-white text-sm font-medium hover:bg-violet-600 disabled:opacity-50 transition-colors"
++              className="px-4 py-2.5 rounded-2xl bg-pink-500 text-white text-sm font-medium hover:bg-pink-600 disabled:opacity-50 transition-colors"
+             >
+               {saving ? "Saving…" : "Add session"}
+             </button>
+diff --git a/src/pages/Settings.jsx b/src/pages/Settings.jsx
+index 0cbc28a..aa1cbb5 100644
+--- a/src/pages/Settings.jsx
++++ b/src/pages/Settings.jsx
+@@ -42,7 +42,7 @@ export default function Settings() {
+ 
+       {loading ? (
+         <div className="flex justify-center py-20">
+-          <div className="w-8 h-8 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
++          <div className="w-8 h-8 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
+         </div>
+       ) : (
+         <div className="max-w-lg space-y-4">
+@@ -51,7 +51,7 @@ export default function Settings() {
+             {user?.picture ? (
+               <img src={user.picture} alt="" className="w-12 h-12 rounded-2xl object-cover" />
+             ) : (
+-              <div className="w-12 h-12 rounded-2xl bg-violet-100 text-violet-600 grid place-items-center">
++              <div className="w-12 h-12 rounded-2xl bg-pink-100 text-pink-600 grid place-items-center">
+                 <User className="w-6 h-6" />
+               </div>
+             )}
+@@ -66,7 +66,7 @@ export default function Settings() {
+             <h2 className="text-sm font-semibold text-muted-foreground mb-3">Preferences</h2>
+             <div className="flex items-center justify-between">
+               <div className="flex items-center gap-2">
+-                <Percent className="w-4 h-4 text-violet-500" />
++                <Percent className="w-4 h-4 text-pink-500" />
+                 <span className="text-sm text-foreground">Required attendance</span>
+               </div>
+               <span className="text-sm font-semibold text-foreground">{requiredPct}%</span>
+@@ -86,7 +86,7 @@ export default function Settings() {
+           {/* About */}
+           <div className="rounded-3xl bg-card border border-border/60 shadow-sm p-5">
+             <div className="flex items-center gap-2 mb-1">
+-              <Info className="w-4 h-4 text-violet-500" />
++              <Info className="w-4 h-4 text-pink-500" />
+               <h2 className="text-sm font-semibold text-muted-foreground">About</h2>
+             </div>
+             <p className="text-xs text-muted-foreground">
+diff --git a/src/pages/SubjectAttendance.jsx b/src/pages/SubjectAttendance.jsx
+index 5c0fa34..078f43d 100644
+--- a/src/pages/SubjectAttendance.jsx
++++ b/src/pages/SubjectAttendance.jsx
+@@ -87,7 +87,7 @@ export default function SubjectAttendance() {
+ 
+         {loading ? (
+           <div className="flex justify-center py-20">
+-            <div className="w-8 h-8 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
++            <div className="w-8 h-8 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
+           </div>
+         ) : subjectRecords.length === 0 ? (
+           <div className="rounded-3xl bg-card border border-border/60 shadow-sm py-16 text-center">
+@@ -114,7 +114,7 @@ export default function SubjectAttendance() {
+ 
+               <button
+                 onClick={() => setShowForm(true)}
+-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-violet-500 text-white font-medium hover:bg-violet-600 transition-colors"
++                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-500 text-white font-medium hover:bg-pink-600 transition-colors"
+               >
+                 <span className="text-lg">+</span>
+                 Log entry for this subject
+diff --git a/src/pages/WeeklyPlan.jsx b/src/pages/WeeklyPlan.jsx
+index 3e84f04..6bbd660 100644
+--- a/src/pages/WeeklyPlan.jsx
++++ b/src/pages/WeeklyPlan.jsx
+@@ -120,9 +120,9 @@ function MonthCalendar({ plans, currentMonth, onMonthChange, selectedDate, onSel
+               onClick={() => onSelectDate(isSelected ? null : dateStr)}
+               className={`relative aspect-square rounded-xl flex flex-col items-center justify-start pt-1.5 gap-1 transition-colors ${
+                 isSelected
+-                  ? "bg-violet-500 text-white"
++                  ? "bg-pink-500 text-white"
+                   : isToday
+-                  ? "bg-violet-100 text-violet-700"
++                  ? "bg-pink-100 text-pink-700"
+                   : inMonth
+                   ? "hover:bg-[hsl(var(--muted))] text-foreground"
+                   : "text-muted-foreground/40 hover:bg-[hsl(var(--muted))]"
+@@ -218,7 +218,7 @@ export default function WeeklyPlan() {
+ 
+           <button
+             onClick={() => setShowForm(true)}
+-            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-violet-500 text-white font-medium shadow-lg shadow-violet-500/25 hover:bg-violet-600 transition-colors"
++            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-500 text-white font-medium shadow-lg shadow-pink-500/25 hover:bg-pink-600 transition-colors"
+           >
+             <span className="text-lg">+</span>
+             Add plan
+@@ -227,7 +227,7 @@ export default function WeeklyPlan() {
+ 
+         {loading ? (
+           <div className="flex justify-center py-20">
+-            <div className="w-8 h-8 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
++            <div className="w-8 h-8 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
+           </div>
+         ) : (
+           <>
+@@ -253,7 +253,7 @@ export default function WeeklyPlan() {
+                     onClick={() => setFilter(key)}
+                     className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                       filter === key
+-                        ? "bg-violet-500 text-white"
++                        ? "bg-pink-500 text-white"
+                         : "bg-card border border-border/60 text-muted-foreground hover:bg-[hsl(var(--muted))]"
+                     }`}
+                   >
+@@ -265,7 +265,7 @@ export default function WeeklyPlan() {
+               {selectedDate && (
+                 <button
+                   onClick={() => setSelectedDate(null)}
+-                  className="text-xs text-violet-600 font-medium hover:underline"
++                  className="text-xs text-pink-600 font-medium hover:underline"
+                 >
+                   Showing {new Date(selectedDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · clear
+                 </button>
+@@ -384,7 +384,7 @@ function PlanForm({ onClose, onSaved, defaultDate }) {
+   const [saving, setSaving] = useState(false);
+ 
+   const inputCls =
+-    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400";
++    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400";
+ 
+   const submit = async (event) => {
+     event.preventDefault();
+@@ -506,7 +506,7 @@ function PlanForm({ onClose, onSaved, defaultDate }) {
+             <button
+               type="submit"
+               disabled={saving}
+-              className="px-4 py-2.5 rounded-2xl bg-violet-500 text-white text-sm font-medium hover:bg-violet-600 disabled:opacity-50 transition-colors"
++              className="px-4 py-2.5 rounded-2xl bg-pink-500 text-white text-sm font-medium hover:bg-pink-600 disabled:opacity-50 transition-colors"
+             >
+               {saving ? "Saving…" : "Add plan"}
+             </button>
+diff --git a/tailwind.config.js b/tailwind.config.js
+index 4cf45da..5e73174 100644
+--- a/tailwind.config.js
++++ b/tailwind.config.js
+@@ -59,6 +59,22 @@ module.exports = {
+   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+   				border: 'hsl(var(--sidebar-border))',
+   				ring: 'hsl(var(--sidebar-ring))'
++  			},
++  			pastelPink: {
++  				DEFAULT: 'hsl(var(--pastel-pink))',
++  				foreground: 'hsl(var(--pastel-pink-foreground))'
++  			},
++  			pastelBlue: {
++  				DEFAULT: 'hsl(var(--pastel-blue))',
++  				foreground: 'hsl(var(--pastel-blue-foreground))'
++  			},
++  			pastelYellow: {
++  				DEFAULT: 'hsl(var(--pastel-yellow))',
++  				foreground: 'hsl(var(--pastel-yellow-foreground))'
++  			},
++  			pastelMint: {
++  				DEFAULT: 'hsl(var(--pastel-mint))',
++  				foreground: 'hsl(var(--pastel-mint-foreground))'
+   			}
+   		},
+   		fontFamily: {

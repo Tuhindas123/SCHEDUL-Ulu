@@ -44,7 +44,7 @@ export default function DatePicker({ value, onChange }) {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
+        className="w-full flex items-center justify-between rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
       >
         <span className="text-foreground">{displayLabel}</span>
         <CalendarIcon className="w-4 h-4 text-muted-foreground" />
@@ -57,7 +57,7 @@ export default function DatePicker({ value, onChange }) {
               type="button"
               onClick={() => { onChange(todayStr); setOpen(false); }}
               className={`flex-1 px-2 py-1.5 rounded-xl text-xs font-medium border transition-colors ${
-                value === todayStr ? "bg-violet-500 text-white border-transparent" : "border-border text-muted-foreground hover:bg-[hsl(var(--muted))]"
+                value === todayStr ? "bg-pink-500 text-white border-transparent" : "border-border text-muted-foreground hover:bg-[hsl(var(--muted))]"
               }`}
             >
               Today
@@ -66,7 +66,7 @@ export default function DatePicker({ value, onChange }) {
               type="button"
               onClick={() => { onChange(yesterdayStr); setOpen(false); }}
               className={`flex-1 px-2 py-1.5 rounded-xl text-xs font-medium border transition-colors ${
-                value === yesterdayStr ? "bg-violet-500 text-white border-transparent" : "border-border text-muted-foreground hover:bg-[hsl(var(--muted))]"
+                value === yesterdayStr ? "bg-pink-500 text-white border-transparent" : "border-border text-muted-foreground hover:bg-[hsl(var(--muted))]"
               }`}
             >
               Yesterday
@@ -115,9 +115,9 @@ export default function DatePicker({ value, onChange }) {
                   onClick={() => { onChange(dateStr); setOpen(false); }}
                   className={`aspect-square rounded-lg text-xs transition-colors ${
                     isSelected
-                      ? "bg-violet-500 text-white font-semibold"
+                      ? "bg-pink-500 text-white font-semibold"
                       : isToday
-                      ? "bg-violet-100 text-violet-700"
+                      ? "bg-pink-100 text-pink-700"
                       : inMonth
                       ? "text-foreground hover:bg-[hsl(var(--muted))]"
                       : "text-muted-foreground/40 hover:bg-[hsl(var(--muted))]"

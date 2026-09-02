@@ -42,7 +42,7 @@ export default function Settings() {
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
         </div>
       ) : (
         <div className="max-w-lg space-y-4">
@@ -51,7 +51,7 @@ export default function Settings() {
             {user?.picture ? (
               <img src={user.picture} alt="" className="w-12 h-12 rounded-2xl object-cover" />
             ) : (
-              <div className="w-12 h-12 rounded-2xl bg-violet-100 text-violet-600 grid place-items-center">
+              <div className="w-12 h-12 rounded-2xl bg-pink-100 text-pink-600 grid place-items-center">
                 <User className="w-6 h-6" />
               </div>
             )}
@@ -66,7 +66,7 @@ export default function Settings() {
             <h2 className="text-sm font-semibold text-muted-foreground mb-3">Preferences</h2>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Percent className="w-4 h-4 text-violet-500" />
+                <Percent className="w-4 h-4 text-pink-500" />
                 <span className="text-sm text-foreground">Required attendance</span>
               </div>
               <span className="text-sm font-semibold text-foreground">{requiredPct}%</span>
@@ -86,7 +86,7 @@ export default function Settings() {
           {/* About */}
           <div className="rounded-3xl bg-card border border-border/60 shadow-sm p-5">
             <div className="flex items-center gap-2 mb-1">
-              <Info className="w-4 h-4 text-violet-500" />
+              <Info className="w-4 h-4 text-pink-500" />
               <h2 className="text-sm font-semibold text-muted-foreground">About</h2>
             </div>
             <p className="text-xs text-muted-foreground">

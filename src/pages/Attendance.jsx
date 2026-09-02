@@ -38,7 +38,7 @@ function SubjectCard({ title, stats, active, onClick }) {
     <button
       onClick={onClick}
       className={`text-left rounded-2xl border p-4 transition-colors ${
-        active ? "border-violet-400 bg-violet-50" : "border-border/60 bg-card hover:bg-[hsl(var(--muted))]"
+        active ? "border-pink-400 bg-pink-50" : "border-border/60 bg-card hover:bg-[hsl(var(--muted))]"
       }`}
     >
       <div className="flex items-center justify-between mb-2 gap-2">
@@ -145,7 +145,7 @@ export default function Attendance() {
           </div>
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-violet-500 text-white font-medium shadow-lg shadow-violet-500/25 hover:bg-violet-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-500 text-white font-medium shadow-lg shadow-pink-500/25 hover:bg-pink-600 transition-colors"
           >
             <span className="text-lg">+</span>
             Log entry
@@ -154,7 +154,7 @@ export default function Attendance() {
 
         {loading ? (
           <div className="flex justify-center py-20">
-            <div className="w-8 h-8 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
           </div>
         ) : (
           <>
@@ -165,7 +165,7 @@ export default function Attendance() {
                   <button
                     onClick={() => setSubjectFilter("all")}
                     className={`text-left rounded-2xl border p-4 transition-colors ${
-                      subjectFilter === "all" ? "border-violet-400 bg-violet-50" : "border-border/60 bg-card hover:bg-[hsl(var(--muted))]"
+                      subjectFilter === "all" ? "border-pink-400 bg-pink-50" : "border-border/60 bg-card hover:bg-[hsl(var(--muted))]"
                     }`}
                   >
                     <p className="font-medium text-foreground mb-2">All subjects</p>
@@ -219,7 +219,7 @@ export default function Attendance() {
                         key={key}
                         onClick={() => setFilter(key)}
                         className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                          filter === key ? "bg-violet-500 text-white" : "bg-card border border-border/60 text-muted-foreground hover:bg-[hsl(var(--muted))]"
+                          filter === key ? "bg-pink-500 text-white" : "bg-card border border-border/60 text-muted-foreground hover:bg-[hsl(var(--muted))]"
                         }`}
                       >
                         {label}
@@ -227,7 +227,7 @@ export default function Attendance() {
                     ))}
                   </div>
                   {subjectFilter !== "all" && (
-                    <button onClick={() => setSubjectFilter("all")} className="text-xs text-violet-600 font-medium hover:underline">
+                    <button onClick={() => setSubjectFilter("all")} className="text-xs text-pink-600 font-medium hover:underline">
                       Clear subject filter
                     </button>
                   )}
@@ -310,7 +310,7 @@ function AttForm({ subjects, onClose, onSaved }) {
   const [saving, setSaving] = useState(false);
 
   const inputCls =
-    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400";
+    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400";
 
   const submit = async (event) => {
     event.preventDefault();
@@ -394,7 +394,7 @@ function AttForm({ subjects, onClose, onSaved }) {
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2.5 rounded-2xl bg-violet-500 text-white text-sm font-medium hover:bg-violet-600 disabled:opacity-50 transition-colors"
+              className="px-4 py-2.5 rounded-2xl bg-pink-500 text-white text-sm font-medium hover:bg-pink-600 disabled:opacity-50 transition-colors"
             >
               {saving ? "Saving…" : "Save entry"}
             </button>

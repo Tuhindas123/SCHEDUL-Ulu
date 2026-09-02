@@ -1,25 +1,30 @@
 import React from "react";
 
-export default function StatCard({ icon: Icon, label, value, sub, tone = "violet" }) {
+export default function StatCard({ icon: Icon, label, value, sub, tone = "pink" }) {
   const tones = {
-    violet: "from-violet-500 to-violet-400 text-white shadow-violet-500/30",
-    coral: "from-rose-500 to-rose-400 text-white shadow-rose-500/30",
-    mint: "from-teal-500 to-teal-400 text-white shadow-teal-500/30",
-    amber: "from-amber-500 to-amber-400 text-white shadow-amber-500/30",
-    sky: "from-sky-500 to-sky-400 text-white shadow-sky-500/30"
+    pink: "bg-pastelPink text-pastelPink-foreground",
+    blue: "bg-pastelBlue text-pastelBlue-foreground",
+    yellow: "bg-pastelYellow text-pastelYellow-foreground",
+    mint: "bg-pastelMint text-pastelMint-foreground",
+    // legacy tone names still used around the app, mapped onto the new palette
+    violet: "bg-pastelBlue text-pastelBlue-foreground",
+    coral: "bg-pastelPink text-pastelPink-foreground",
+    amber: "bg-pastelYellow text-pastelYellow-foreground",
+    sky: "bg-pastelBlue text-pastelBlue-foreground"
   };
+
   return (
-    <div className="rounded-3xl bg-card p-5 border border-border/60 shadow-sm">
-      <div className="flex items-center gap-3">
-        <div className={`w-11 h-11 rounded-2xl grid place-items-center bg-gradient-to-br ${tones[tone]} shadow-lg`}>
-          {Icon && <Icon className="w-5 h-5" />}
-        </div>
-        <div className="min-w-0">
-          <p className="text-[13px] font-medium text-muted-foreground truncate">{label}</p>
-          <p className="text-2xl font-heading font-bold text-foreground leading-tight">{value}</p>
-        </div>
+    <div className={`rounded-3xl p-5 ${tones[tone] || tones.pink}`}>
+      <div className="flex items-center justify-between">
+        <p className="text-[13px] font-medium opacity-70 truncate">{label}</p>
+        {Icon && (
+          <div className="w-8 h-8 rounded-xl grid place-items-center bg-white/40 shrink-0">
+            <Icon className="w-4 h-4" />
+          </div>
+        )}
       </div>
-      {sub && <p className="mt-3 text-xs text-muted-foreground">{sub}</p>}
+      <p className="text-2xl font-heading font-bold leading-tight mt-2">{value}</p>
+      {sub && <p className="mt-2 text-xs opacity-70">{sub}</p>}
     </div>
   );
 }

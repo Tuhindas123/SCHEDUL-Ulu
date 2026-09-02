@@ -59,6 +59,22 @@ module.exports = {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
+  			},
+  			pastelPink: {
+  				DEFAULT: 'hsl(var(--pastel-pink))',
+  				foreground: 'hsl(var(--pastel-pink-foreground))'
+  			},
+  			pastelBlue: {
+  				DEFAULT: 'hsl(var(--pastel-blue))',
+  				foreground: 'hsl(var(--pastel-blue-foreground))'
+  			},
+  			pastelYellow: {
+  				DEFAULT: 'hsl(var(--pastel-yellow))',
+  				foreground: 'hsl(var(--pastel-yellow-foreground))'
+  			},
+  			pastelMint: {
+  				DEFAULT: 'hsl(var(--pastel-mint))',
+  				foreground: 'hsl(var(--pastel-mint-foreground))'
   			}
   		},
   		fontFamily: {

@@ -4,43 +4,58 @@
 
 @layer base {
   :root {
-    --background: 48 70% 98%;
-    --foreground: 210 14% 16%;
-    --card: 0 0% 100%;
-    --card-foreground: 210 14% 16%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 14% 16%;
-    --primary: 258 82% 62%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 48 60% 95%;
-    --secondary-foreground: 258 82% 42%;
-    --muted: 48 50% 94%;
-    --muted-foreground: 210 10% 42%;
-    --accent: 4 100% 72%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 64%;
+    /* Warm cream base, matching a soft paper-like backdrop */
+    --background: 42 46% 95%;
+    --foreground: 240 10% 14%;
+    --card: 40 45% 98%;
+    --card-foreground: 240 10% 14%;
+    --popover: 40 45% 98%;
+    --popover-foreground: 240 10% 14%;
+    /* Near-black primary — used for CTA buttons + sidebar, echoing the reference's black pills */
+    --primary: 240 9% 11%;
+    --primary-foreground: 42 40% 97%;
+    --secondary: 45 48% 92%;
+    --secondary-foreground: 240 8% 16%;
+    --muted: 42 35% 91%;
+    --muted-foreground: 32 9% 44%;
+    /* Soft pink — the recurring highlight accent */
+    --accent: 340 78% 84%;
+    --accent-foreground: 340 45% 24%;
+    --destructive: 3 78% 62%;
     --destructive-foreground: 0 0% 100%;
-    --border: 48 40% 90%;
-    --input: 48 40% 90%;
-    --ring: 258 82% 62%;
-    --chart-1: 258 82% 62%;
-    --chart-2: 179 100% 40%;
-    --chart-3: 36 97% 64%;
-    --chart-4: 4 100% 72%;
-    --chart-5: 200 95% 52%;
-    --radius: 1.25rem;
-    --font-heading: ui-sans-serif, system-ui, sans-serif;
-    --font-body: ui-sans-serif, system-ui, sans-serif;
-    --font-display: ui-sans-serif, system-ui, sans-serif;
+    --border: 42 28% 87%;
+    --input: 42 28% 87%;
+    --ring: 240 9% 11%;
+    --chart-1: 340 78% 82%;
+    --chart-2: 205 72% 80%;
+    --chart-3: 45 88% 72%;
+    --chart-4: 158 40% 68%;
+    --chart-5: 258 45% 78%;
+    --radius: 1.5rem;
+    --font-heading: "Manrope", ui-sans-serif, system-ui, sans-serif;
+    --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Manrope", ui-sans-serif, system-ui, sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Pastel tints for stat cards / tags — soft fill + a darker readable foreground */
+    --pastel-pink: 340 78% 87%;
+    --pastel-pink-foreground: 340 55% 26%;
+    --pastel-blue: 208 72% 85%;
+    --pastel-blue-foreground: 210 55% 26%;
+    --pastel-yellow: 45 88% 78%;
+    --pastel-yellow-foreground: 38 55% 24%;
+    --pastel-mint: 158 42% 82%;
+    --pastel-mint-foreground: 160 45% 22%;
+
+    /* Floating dark sidebar, like the reference's near-black nav card */
+    --sidebar-background: 240 10% 10%;
+    --sidebar-foreground: 42 22% 90%;
+    --sidebar-primary: 340 78% 84%;
+    --sidebar-primary-foreground: 240 10% 12%;
+    --sidebar-accent: 240 8% 16%;
+    --sidebar-accent-foreground: 42 25% 95%;
+    --sidebar-border: 240 8% 18%;
+    --sidebar-ring: 340 78% 84%;
   }
 
   .dark {

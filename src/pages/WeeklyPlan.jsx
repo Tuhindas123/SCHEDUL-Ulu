@@ -120,9 +120,9 @@ function MonthCalendar({ plans, currentMonth, onMonthChange, selectedDate, onSel
               onClick={() => onSelectDate(isSelected ? null : dateStr)}
               className={`relative aspect-square rounded-xl flex flex-col items-center justify-start pt-1.5 gap-1 transition-colors ${
                 isSelected
-                  ? "bg-violet-500 text-white"
+                  ? "bg-pink-500 text-white"
                   : isToday
-                  ? "bg-violet-100 text-violet-700"
+                  ? "bg-pink-100 text-pink-700"
                   : inMonth
                   ? "hover:bg-[hsl(var(--muted))] text-foreground"
                   : "text-muted-foreground/40 hover:bg-[hsl(var(--muted))]"
@@ -218,7 +218,7 @@ export default function WeeklyPlan() {
 
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-violet-500 text-white font-medium shadow-lg shadow-violet-500/25 hover:bg-violet-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-500 text-white font-medium shadow-lg shadow-pink-500/25 hover:bg-pink-600 transition-colors"
           >
             <span className="text-lg">+</span>
             Add plan
@@ -227,7 +227,7 @@ export default function WeeklyPlan() {
 
         {loading ? (
           <div className="flex justify-center py-20">
-            <div className="w-8 h-8 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
           </div>
         ) : (
           <>
@@ -253,7 +253,7 @@ export default function WeeklyPlan() {
                     onClick={() => setFilter(key)}
                     className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors ${
                       filter === key
-                        ? "bg-violet-500 text-white"
+                        ? "bg-pink-500 text-white"
                         : "bg-card border border-border/60 text-muted-foreground hover:bg-[hsl(var(--muted))]"
                     }`}
                   >
@@ -265,7 +265,7 @@ export default function WeeklyPlan() {
               {selectedDate && (
                 <button
                   onClick={() => setSelectedDate(null)}
-                  className="text-xs text-violet-600 font-medium hover:underline"
+                  className="text-xs text-pink-600 font-medium hover:underline"
                 >
                   Showing {new Date(selectedDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · clear
                 </button>
@@ -384,7 +384,7 @@ function PlanForm({ onClose, onSaved, defaultDate }) {
   const [saving, setSaving] = useState(false);
 
   const inputCls =
-    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400";
+    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400";
 
   const submit = async (event) => {
     event.preventDefault();
@@ -506,7 +506,7 @@ function PlanForm({ onClose, onSaved, defaultDate }) {
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2.5 rounded-2xl bg-violet-500 text-white text-sm font-medium hover:bg-violet-600 disabled:opacity-50 transition-colors"
+              className="px-4 py-2.5 rounded-2xl bg-pink-500 text-white text-sm font-medium hover:bg-pink-600 disabled:opacity-50 transition-colors"
             >
               {saving ? "Saving…" : "Add plan"}
             </button>

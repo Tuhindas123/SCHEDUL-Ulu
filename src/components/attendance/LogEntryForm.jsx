@@ -23,7 +23,7 @@ export default function LogEntryForm({ sessions, initial, onClose, onSaved }) {
   const [saving, setSaving] = useState(false);
 
   const inputCls =
-    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 disabled:opacity-60";
+    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 disabled:opacity-60";
 
   const submit = async (event) => {
     event.preventDefault();
@@ -138,7 +138,7 @@ export default function LogEntryForm({ sessions, initial, onClose, onSaved }) {
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2.5 rounded-2xl bg-violet-500 text-white text-sm font-medium hover:bg-violet-600 disabled:opacity-50 transition-colors"
+              className="px-4 py-2.5 rounded-2xl bg-pink-500 text-white text-sm font-medium hover:bg-pink-600 disabled:opacity-50 transition-colors"
             >
               {saving ? "Saving…" : "Add entry"}
             </button>

@@ -87,7 +87,7 @@ export default function SubjectAttendance() {
 
         {loading ? (
           <div className="flex justify-center py-20">
-            <div className="w-8 h-8 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
           </div>
         ) : subjectRecords.length === 0 ? (
           <div className="rounded-3xl bg-card border border-border/60 shadow-sm py-16 text-center">
@@ -114,7 +114,7 @@ export default function SubjectAttendance() {
 
               <button
                 onClick={() => setShowForm(true)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-violet-500 text-white font-medium hover:bg-violet-600 transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-500 text-white font-medium hover:bg-pink-600 transition-colors"
               >
                 <span className="text-lg">+</span>
                 Log entry for this subject
