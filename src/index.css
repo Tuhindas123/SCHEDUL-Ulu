@@ -4,21 +4,18 @@
 
 @layer base {
   :root {
-    /* Warm cream base, matching a soft paper-like backdrop */
     --background: 42 46% 95%;
     --foreground: 240 10% 14%;
     --card: 40 45% 98%;
     --card-foreground: 240 10% 14%;
     --popover: 40 45% 98%;
     --popover-foreground: 240 10% 14%;
-    /* Near-black primary — used for CTA buttons + sidebar, echoing the reference's black pills */
     --primary: 240 9% 11%;
     --primary-foreground: 42 40% 97%;
     --secondary: 45 48% 92%;
     --secondary-foreground: 240 8% 16%;
     --muted: 42 35% 91%;
     --muted-foreground: 32 9% 44%;
-    /* Soft pink — the recurring highlight accent */
     --accent: 340 78% 84%;
     --accent-foreground: 340 45% 24%;
     --destructive: 3 78% 62%;
@@ -37,7 +34,6 @@
     --font-display: "Manrope", ui-sans-serif, system-ui, sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-    /* Pastel tints for stat cards / tags — soft fill + a darker readable foreground */
     --pastel-pink: 340 78% 87%;
     --pastel-pink-foreground: 340 55% 26%;
     --pastel-blue: 208 72% 85%;
@@ -47,7 +43,6 @@
     --pastel-mint: 158 42% 82%;
     --pastel-mint-foreground: 160 45% 22%;
 
-    /* Floating dark sidebar, like the reference's near-black nav card */
     --sidebar-background: 240 10% 10%;
     --sidebar-foreground: 42 22% 90%;
     --sidebar-primary: 340 78% 84%;
@@ -93,8 +88,6 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
-
-
 
 @layer base {
   * {
