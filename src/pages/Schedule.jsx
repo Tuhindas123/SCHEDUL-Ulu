@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Clock, MapPin, Trash2, X } from "lucide-react";
 import { api } from "@/api/apiClient";
 import AppShell from "@/components/layout/AppShell";
 import SubjectSelect from "@/components/shared/SubjectSelect";
 import SubjectManager from "@/components/shared/SubjectManager";
+import WeekGrid from "@/components/schedule/WeekGrid";
+import TimetableUpload from "@/components/schedule/TimetableUpload";
 import {
   COLOR_TAGS,
   TYPE_LABELS,
@@ -11,6 +13,7 @@ import {
   DAY_LABELS,
   formatTime,
   sessionsForDay,
+  getWeekStart,
 } from "@/lib/studentUtils";
 
 export default function Schedule() {
@@ -19,6 +22,8 @@ export default function Schedule() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [showManager, setShowManager] = useState(false);
+  const [showUpload, setShowUpload] = useState(false);
+  const [activeSubjectId, setActiveSubjectId] = useState("all");
 
   const load = async () => {
     try {
@@ -50,16 +55,45 @@ export default function Schedule() {
     }
   };
 
+  const filteredSessions = useMemo(() => {
+    if (activeSubjectId === "all") return sessions;
+    return sessions.filter((s) => s.subject_id === activeSubjectId);
+  }, [sessions, activeSubjectId]);
+
+  const weekLabel = useMemo(() => {
+    const start = getWeekStart(new Date());
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    const sameMonth = start.getMonth() === end.getMonth();
+    const startStr = start.toLocaleDateString("en-US", { day: "numeric", month: sameMonth ? undefined : "short" });
+    const endStr = end.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
+    return `${startStr} – ${endStr}`;
+  }, []);
+
   return (
     <AppShell>
       <div className="space-y-6">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-foreground">Schedule</h1>
-            <p className="text-sm text-muted-foreground mt-1">Your weekly rhythm, laid out by day.</p>
+            <h1 className="text-2xl font-heading font-bold text-foreground">Schedule</h1>
+            <p className="text-sm text-muted-foreground mt-1">{weekLabel}</p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <button
+            onClick={async () => {
+              if (sessions.length > 0) {
+                await Promise.all(sessions.map((s) => api.deleteClassSession(s.id)));
+                await Promise.all(subjects.map((s) => api.deleteSubject(s.id)));
+                setActiveSubjectId("all");
+                await load();
+              }
+              setShowUpload(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-border text-sm font-medium hover:bg-muted transition-colors"
+          >
+            {sessions.length > 0 ? "Clear & reupload" : "Upload timetable"}
+          </button>
             <button
               onClick={() => setShowManager(true)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-border text-sm font-medium hover:bg-muted transition-colors"
@@ -68,76 +102,126 @@ export default function Schedule() {
             </button>
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-500 text-white font-medium shadow-lg shadow-pink-500/25 hover:bg-pink-600 transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-primary text-primary-foreground font-medium text-sm"
             >
-              <span className="text-lg">+</span>
-              Add session
+              <span className="text-lg leading-none">+</span>
+              Add event
             </button>
           </div>
         </div>
+
+        {/* Subject filter pills */}
+        {subjects.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setActiveSubjectId("all")}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                activeSubjectId === "all"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/70"
+              }`}
+            >
+              All
+            </button>
+            {subjects.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setActiveSubjectId(s.id)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  activeSubjectId === s.id
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-muted/70"
+                }`}
+              >
+                {s.name}
+              </button>
+            ))}
+          </div>
+        )}
 
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="w-8 h-8 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {DAYS.map((day) => {
-              const list = sessionsForDay(sessions, day);
-              return (
-                <div key={day} className="rounded-3xl bg-card border border-border/60 shadow-sm p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-foreground capitalize">{DAY_LABELS[day]}</h3>
-                    <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full bg-[hsl(var(--muted))]">
-                      {list.length}
-                    </span>
-                  </div>
+          <>
+            {/* Desktop: real weekly time grid */}
+            <div className="hidden lg:block">
+              <WeekGrid sessions={filteredSessions} />
+            </div>
 
-                  {list.length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-6 text-center">Free day</p>
-                  ) : (
-                    <div className="space-y-2.5">
-                      {list.map((session) => {
-                        const tag = COLOR_TAGS[session.color_tag] || COLOR_TAGS.violet;
-                        return (
-                          <div key={session.id} className="group rounded-2xl bg-[hsl(var(--muted))] px-3.5 py-3">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="min-w-0">
-                                <p className="font-medium text-foreground truncate">{session.title}</p>
-                                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                                  <Clock className="w-3 h-3" />
-                                  {formatTime(session.start_time)}–{formatTime(session.end_time)}
-                                </p>
-                                {session.location && (
-                                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                                    <MapPin className="w-3 h-3" />
-                                    {session.location}
-                                  </p>
-                                )}
-                              </div>
-                              <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${tag.bg} ${tag.text} font-medium shrink-0`}>
-                                {TYPE_LABELS[session.type] || session.type}
-                              </span>
-                            </div>
-
-                            <div className="flex justify-end mt-1">
-                              <button
-                                onClick={() => handleDelete(session.id)}
-                                className="opacity-0 group-hover:opacity-100 text-rose-400 hover:text-rose-600 transition-opacity"
-                                title="Delete session"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
+            {/* Mobile: day-by-day list, easier to scan on a small screen */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:hidden">
+              {DAYS.map((day) => {
+                const list = sessionsForDay(filteredSessions, day);
+                return (
+                  <div key={day} className="rounded-3xl bg-card border border-border/60 shadow-sm p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-semibold text-foreground capitalize">{DAY_LABELS[day]}</h3>
+                      <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full bg-[hsl(var(--muted))]">
+                        {list.length}
+                      </span>
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+
+                    {list.length === 0 ? (
+                      <p className="text-sm text-muted-foreground py-6 text-center">Free day</p>
+                    ) : (
+                      <div className="space-y-2.5">
+                        {list.map((session) => {
+                          const tag = COLOR_TAGS[session.color_tag] || COLOR_TAGS.violet;
+                          return (
+                            <div key={session.id} className="group rounded-2xl bg-[hsl(var(--muted))] px-3.5 py-3">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="min-w-0">
+                                  <p className="font-medium text-foreground truncate">{session.title}</p>
+                                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                                    <Clock className="w-3 h-3" />
+                                    {formatTime(session.start_time)}–{formatTime(session.end_time)}
+                                  </p>
+                                  {session.location && (
+                                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                                      <MapPin className="w-3 h-3" />
+                                      {session.location}
+                                    </p>
+                                  )}
+                                  {session.is_recurring === false && (
+                                    <span className="inline-block mt-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-pastelPink text-pastelPink-foreground">
+                                      Custom
+                                    </span>
+                                  )}
+                                </div>
+                                <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${tag.bg} ${tag.text} font-medium shrink-0`}>
+                                  {TYPE_LABELS[session.type] || session.type}
+                                </span>
+                              </div>
+
+                              <div className="flex justify-end mt-1">
+                                <button
+                                  onClick={() => handleDelete(session.id)}
+                                  className="opacity-0 group-hover:opacity-100 text-rose-400 hover:text-rose-600 transition-opacity"
+                                  title="Delete session"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        {showUpload && (
+          <TimetableUpload
+            subjects={subjects}
+            onImported={load}
+            onClose={() => setShowUpload(false)}
+          />
         )}
 
         {showManager && (
@@ -292,6 +376,21 @@ function SessionForm({ subjects, onClose, onSaved }) {
               ))}
             </div>
           </div>
+
+          <label className="flex items-center gap-2.5 rounded-2xl border border-border px-3.5 py-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.is_recurring}
+              onChange={(event) => setForm({ ...form, is_recurring: event.target.checked })}
+              className="w-4 h-4 accent-pink-500"
+            />
+            <span className="text-sm text-foreground">
+              Recurring weekly class
+              <span className="block text-xs text-muted-foreground font-normal">
+                Uncheck for a one-off override — shows a "Custom" tag on the schedule
+              </span>
+            </span>
+          </label>
 
           <textarea
             className={inputCls}
