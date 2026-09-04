@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Tracker</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <style> body { background-color: #f7f4ed; } </style>
+</head>
+<body class="text-gray-800 font-sans antialiased">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        function App() {
+            const [activeTab, setActiveTab] = useState('home');
+            const [schedule, setSchedule] = useState(() => JSON.parse(localStorage.getItem('ft_schedule') || '[]'));
+
+            useEffect(() => {
+                localStorage.setItem('ft_schedule', JSON.stringify(schedule));
+            }, [schedule]);
+
+            const handleFileUpload = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    const bstr = evt.target.result;
+                    const wb = XLSX.read(bstr, { type: 'binary' });
+                    const wsname = wb.SheetNames[0];
+                    const ws = wb.Sheets[wsname];
+                    const data = XLSX.utils.sheet_to_json(ws);
+                    setSchedule(data);
+                };
+                reader.readAsBinaryString(file);
+            };
+
+            return (
+                /* Strict side-by-side layout container */
+                <div class="flex h-screen w-screen overflow-hidden">
+                    
+                    {/* Fixed Dark Sidebar */}
+                    <aside class="w-64 bg-[#1a1b1e] text-white p-6 flex flex-col justify-between shrink-0 h-full">
+                        <div>
+                            <div class="flex items-center gap-3 mb-8">
+                                <span class="text-xl">✨</span>
+                                <div>
+                                    <h1 class="font-bold text-lg leading-none">Flow Tracker</h1>
+                                    <p class="text-xs text-gray-400 mt-1">your week, in colour</p>
+                                </div>
+                            </div>
+
+                            <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">General</p>
+
+                            <nav class="space-y-1">
+                                <button 
+                                    onClick={() => setActiveTab('home')}
+                                    class={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition ${activeTab === 'home' ? 'bg-[#2d2f36] text-white' : 'text-gray-400 hover:text-white'}`}>
+                                    <span>🔲</span> Home
+                                </button>
+                                <button 
+                                    onClick={() => setActiveTab('schedule')}
+                                    class={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition ${activeTab === 'schedule' ? 'bg-[#2d2f36] text-white' : 'text-gray-400 hover:text-white'}`}>
+                                    <span>📅</span> Schedule
+                                </button>
+                            </nav>
+                        </div>
+                    </aside>
+
+                    {/* Content View Area */}
+                    <main class="flex-1 h-full overflow-y-auto p-10">
+                        {activeTab === 'home' && (
+                            <div class="space-y-6">
+                                <h2 class="text-3xl font-bold">Hey there 👋</h2>
+                                <p class="text-sm text-gray-500">Welcome to Flow Tracker.</p>
+                                <div class="bg-white p-6 rounded-2xl border border-gray-200">
+                                    <p class="font-bold">Loaded Classes: {schedule.length}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'schedule' && (
+                            <div class="space-y-6">
+                                <h2 class="text-2xl font-bold">Schedule</h2>
+                                <div class="bg-white p-6 rounded-2xl border border-gray-200">
+                                    <p class="font-bold text-sm mb-2">Upload Excel Timetable</p>
+                                    <input type="file" accept=".xls,.xlsx" onChange={handleFileUpload} class="text-xs" />
+                                </div>
+
+                                {schedule.length > 0 ? (
+                                    <div class="grid grid-cols-3 gap-4">
+                                        {schedule.map((item, idx) => (
+                                            <div key={idx} class="bg-white p-4 rounded-xl border border-gray-200">
+                                                <p class="font-bold text-sm">{item.Subject || 'Class'}</p>
+                                                <p class="text-xs text-gray-500">{item.Day} • {item.Time}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div class="bg-white p-8 text-center rounded-xl border border-dashed border-gray-300">
+                                        <p class="text-xs text-gray-400">Schedule is empty. Upload a file above.</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </main>
+
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

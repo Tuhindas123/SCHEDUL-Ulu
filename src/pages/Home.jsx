@@ -9,11 +9,13 @@ import {
 import { Link } from "react-router-dom";
 
 import { api } from "@/api/apiClient";
+import { getSession, getStoredUser } from "@/lib/supabaseAuth";
 import AppShell from "@/components/layout/AppShell";
 import StatCard from "@/components/dashboard/StatCard";
 import AttendanceRing from "@/components/dashboard/AttendanceRing";
 import TodaySchedule from "@/components/dashboard/TodaySchedule";
 import WeekPlanList from "@/components/dashboard/WeekPlanList";
+import DateTimeCard from "@/components/dashboard/DateTimeCard";
 
 import {
   todayKey,
@@ -30,23 +32,26 @@ export default function Home() {
   const [records, setRecords] = useState([]);
   const [plans, setPlans] = useState([]);
   const [setting, setSetting] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const loadDashboard = async () => {
       try {
         setLoading(true);
 
-        const [s, r, p, st] = await Promise.all([
+        const [s, r, p, st, session] = await Promise.all([
           api.getClassSessions(),
           api.getAttendanceRecords(),
           api.getWeeklyPlans(),
           api.getSyncSettings(),
+          getSession(),
         ]);
 
         setSessions(s || []);
         setRecords(r || []);
         setPlans(p || []);
         setSetting(st?.[0] || null);
+        setUser(getStoredUser(session));
       } catch (error) {
         console.error("Failed to load dashboard:", error);
       } finally {
@@ -66,6 +71,25 @@ export default function Home() {
 
   const next = nextSession(sessions);
 
+  const firstName = user?.name ? user.name.split(" ")[0] : null;
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+
+  const summaryLine = (() => {
+    const parts = [];
+    parts.push("Flow Tracker wishes you a focused, productive day.");
+    if (todaySessions.length > 0) {
+      parts.push(
+        `You have ${todaySessions.length} class${todaySessions.length === 1 ? "" : "es"} today${
+          next ? `, next up at ${formatTime(next.start_time)}` : ""
+        }.`
+      );
+    } else {
+      parts.push("Nothing on your plate today — enjoy the breather.");
+    }
+    return parts.join(" ");
+  })();
+
   if (loading) {
     return (
       <AppShell>
@@ -80,22 +104,17 @@ export default function Home() {
     <AppShell>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <p className="text-sm text-muted-foreground">
-            {new Date().toLocaleDateString("en-US", {
-              weekday: "long",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-5">
+          <div className="max-w-xl">
+            <h1 className="text-3xl font-heading font-bold text-foreground leading-tight">
+              {greeting}{firstName ? `, ${firstName}` : ""}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+              {summaryLine}
+            </p>
+          </div>
 
-          <h1 className="text-3xl font-heading font-bold text-foreground mt-1">
-            Hey there 👋
-          </h1>
-
-          <p className="text-sm text-muted-foreground mt-1">
-            Here's your flow for today.
-          </p>
+          <DateTimeCard />
         </div>
 
         {/* Statistics */}
