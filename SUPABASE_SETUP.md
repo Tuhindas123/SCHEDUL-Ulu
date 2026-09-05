@@ -1,4 +1,4 @@
-# Migrating Flow Tracker from Google Sheets → Supabase
+# Migrating Schedul-Ulu from Google Sheets → Supabase
 
 This patch replaces the Google-Sheets-as-a-database backend with a real
 Postgres database (Supabase), shared by both the website and the Capacitor

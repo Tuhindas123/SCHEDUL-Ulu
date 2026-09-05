@@ -17,7 +17,7 @@ import Feedback from "./pages/Feedback";
  
 const routerBase = Capacitor.isNativePlatform() || import.meta.env.DEV || import.meta.env.VITE_HOST_ENV === 'cloudflare' 
   ? '/' 
-  : '/flow-tracker'; 
+  : '/schedul-ulu'; 
  
 function App() { 
   const [session, setSession] = useState(null); 

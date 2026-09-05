@@ -111,7 +111,7 @@ export default function Feedback() {
             </div>
             <h1 className="text-xl font-heading font-bold text-foreground mb-1">Thanks for the feedback!</h1>
             <p className="text-sm text-muted-foreground mb-6">
-              It really helps us get Flow Tracker ready for launch.
+              It really helps us get Schedul-Ulu ready for launch.
             </p>
             <Link
               to="/settings"

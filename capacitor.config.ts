@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.flowtracker.app',
-  appName: 'Flow Tracker',
+  appId: 'com.schedululu.app',
+  appName: 'Schedul-Ulu',
   webDir: 'dist',
 };
 

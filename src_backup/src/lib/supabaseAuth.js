@@ -9,7 +9,7 @@ export async function signInWithGoogle() {
   provider: "google",
   options: {
     redirectTo: isNative
-      ? "com.flowtracker.app://login-callback"
+      ? "com.schedululu.app://login-callback"
       : window.location.origin + "/",
     skipBrowserRedirect: isNative,
     scopes: "https://www.googleapis.com/auth/drive.file",

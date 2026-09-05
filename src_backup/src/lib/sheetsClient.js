@@ -64,7 +64,7 @@ async function findExistingSheet() {
   }
 
   // Search Drive for an existing active database
-  const res = await authedFetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent("name='Student Flow Tracker Data' and trashed=false")}&fields=files(id)`);
+  const res = await authedFetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent("name='Student Schedul-Ulu Data' and trashed=false")}&fields=files(id)`);
   const json = await res.json();
   if (json.files?.length) {
     localStorage.setItem("gs_spreadsheet_id", json.files[0].id);
@@ -77,7 +77,7 @@ async function findExistingSheet() {
 async function createSheet() {
   const createRes = await authedFetch("https://sheets.googleapis.com/v4/spreadsheets", {
     method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ properties: { title: "Student Flow Tracker Data" }, sheets: [{ properties: { sheetId: SID.backend, title: "Backend_Data" } }] })
+    body: JSON.stringify({ properties: { title: "Student Schedul-Ulu Data" }, sheets: [{ properties: { sheetId: SID.backend, title: "Backend_Data" } }] })
   });
   const sheet = await createRes.json();
   const spreadsheetId = sheet.spreadsheetId;

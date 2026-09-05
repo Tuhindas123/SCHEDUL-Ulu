@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:812967524095:android:84311da9283a1b5032beca",
         "android_client_info": {
-          "package_name": "com.flowtracker.app"
+          "package_name": "com.schedululu.app"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "105526018528-ke8t06tfmo2g7gdqmg0idm8i2o9p56sr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.flowtracker.app",
+            "package_name": "com.schedululu.app",
             "certificate_hash": "69287cd9e7da9b0ac3586f3aededb19e56fa0a71"
           }
         },

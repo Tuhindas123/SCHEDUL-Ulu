@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "short_name": "Flow Tracker",
-  "name": "Flow Tracker App",
-  "description": "Flow Tracker Application",
+  "short_name": "Schedul-Ulu",
+  "name": "Schedul-Ulu App",
+  "description": "Schedul-Ulu Application",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

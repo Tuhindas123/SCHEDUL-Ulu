@@ -1,4 +1,4 @@
-package com.flowtracker.app;
+package com.schedululu.app;
 
 import com.getcapacitor.BridgeActivity;
 

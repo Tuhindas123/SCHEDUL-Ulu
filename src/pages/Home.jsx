@@ -77,7 +77,7 @@ export default function Home() {
 
   const summaryLine = (() => {
     const parts = [];
-    parts.push("Flow Tracker wishes you a focused, productive day.");
+    parts.push("Schedul-Ulu wishes you a focused, productive day.");
     if (todaySessions.length > 0) {
       parts.push(
         `You have ${todaySessions.length} class${todaySessions.length === 1 ? "" : "es"} today${

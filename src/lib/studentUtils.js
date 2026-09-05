@@ -1,4 +1,4 @@
-// Shared helpers for the Student Flow Tracker UI.
+// Shared helpers for the Student Schedul-Ulu UI.
 
 export const COLOR_TAGS = {
   violet: { bg: "bg-violet-100", text: "text-violet-700", ring: "ring-violet-300", dot: "bg-violet-500", solid: "bg-violet-500", soft: "bg-violet-50" },

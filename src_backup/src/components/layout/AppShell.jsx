@@ -22,7 +22,7 @@ export default function AppShell({ children }) {
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <p className="font-heading font-bold text-white leading-tight">Flow Tracker</p>
+                <p className="font-heading font-bold text-white leading-tight">Schedul-Ulu</p>
                 <p className="text-[11px] text-sidebar-foreground/60 leading-tight">your week, in colour</p>
               </div>
             </div>
@@ -75,7 +75,7 @@ export default function AppShell({ children }) {
           <div className="w-8 h-8 rounded-xl bg-sidebar text-white grid place-items-center">
             <Sparkles className="w-4 h-4" />
           </div>
-          <p className="font-heading font-bold text-foreground text-sm">Flow Tracker</p>
+          <p className="font-heading font-bold text-foreground text-sm">Schedul-Ulu</p>
         </header>
 
         {/* Main */}

@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Flow Tracker</string>
-    <string name="title_activity_main">Flow Tracker</string>
-    <string name="package_name">com.flowtracker.app</string>
-    <string name="custom_url_scheme">com.flowtracker.app</string>
+    <string name="app_name">Schedul-Ulu</string>
+    <string name="title_activity_main">Schedul-Ulu</string>
+    <string name="package_name">com.schedululu.app</string>
+    <string name="custom_url_scheme">com.schedululu.app</string>
     <string name="server_client_id">105526018528-snp4pnkfoqi3er3cp0veeti3ekgl7ugd.apps.googleusercontent.com</string>
 
 </resources>

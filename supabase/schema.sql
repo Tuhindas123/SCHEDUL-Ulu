@@ -1,4 +1,4 @@
--- Flow Tracker: Supabase schema
+-- Schedul-Ulu: Supabase schema
 -- Run this once in the Supabase SQL editor (Project -> SQL Editor -> New query).
 
 create extension if not exists "pgcrypto";

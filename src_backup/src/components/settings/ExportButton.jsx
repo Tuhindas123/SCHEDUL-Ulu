@@ -61,7 +61,7 @@ function arrayBufferToBase64(buffer) {
   return btoa(binary);
 }
 
-const FILENAME = "flow-tracker-export.xlsx";
+const FILENAME = "schedul-ulu-export.xlsx";
 
 async function getGoogleAccessToken() {
   const { data } = await supabase.auth.getSession();
@@ -134,7 +134,7 @@ export default function ExportButton({ className = "" }) {
 
       if (Capacitor.isNativePlatform() && uri) {
         await Share.share({
-          title: "Flow Tracker Export",
+          title: "Schedul-Ulu Export",
           url: uri,
           dialogTitle: "Share your export",
         });
