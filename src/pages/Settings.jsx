@@ -153,7 +153,7 @@ export default function Settings() {
               <h2 className="text-sm font-semibold text-muted-foreground">About</h2>
             </div>
             <p className="text-xs text-muted-foreground">
-              Flow Tracker · v1.0 · synced via Supabase across web &amp; app
+              SCHEDUL-Ulu · v1.0 · synced via Supabase across web &amp; app
             </p>
           </div>
 

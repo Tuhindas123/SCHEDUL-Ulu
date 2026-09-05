@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import io
 
-app = FastAPI(title="Flow-Tracker API")
+app = FastAPI(title="Schedul-Ulu API")
 
 app.add_middleware(
     CORSMiddleware,

@@ -4,7 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  base: './',   // must be relative, not '/flow-tracker/'
+  base: './',   // must be relative, not '/schedul-ulu/'
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

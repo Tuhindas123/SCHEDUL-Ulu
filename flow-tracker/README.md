@@ -1,4 +1,4 @@
-# Flow-Tracker
+# Schedul-Ulu
 
 Dynamic Timetable Management System & Smart Schedule Assistant for students.
 

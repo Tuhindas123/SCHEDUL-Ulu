@@ -30,7 +30,7 @@ export default function Login() {
         </div>
 
         <h1 className="text-xl font-heading font-bold text-foreground mb-1">
-          Flow Tracker
+             SCHEDUL-Ulu
         </h1>
         <p className="text-sm text-muted-foreground mb-6">
           Sign in to save your data.

@@ -89,7 +89,7 @@ warning: in the working copy of 'src/pages/Settings.jsx', LF will be replaced by
 [31m- [m
 [31m-const routerBase = Capacitor.isNativePlatform() || import.meta.env.DEV || import.meta.env.VITE_HOST_ENV === 'cloudflare' [m
 [31m-  ? '/' [m
-[31m-  : '/flow-tracker'; [m
+[31m-  : '/schedul-ulu'; [m
 [31m- [m
 [31m-function App() { [m
 [31m-  const [session, setSession] = useState(null); [m
