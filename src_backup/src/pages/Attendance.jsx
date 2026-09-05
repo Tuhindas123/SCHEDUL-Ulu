@@ -38,7 +38,7 @@ function SubjectCard({ title, stats, active, onClick }) {
     <button
       onClick={onClick}
       className={`text-left rounded-2xl border p-4 transition-colors ${
-        active ? "border-pink-400 bg-pink-50" : "border-border/60 bg-card hover:bg-[hsl(var(--muted))]"
+        active ? "border-pink-400 bg-pink-500/10" : "border-border/60 bg-card hover:bg-[hsl(var(--muted))]"
       }`}
     >
       <div className="flex items-center justify-between mb-2 gap-2">
@@ -198,7 +198,7 @@ export default function Attendance() {
                   <Stat label="Cancelled" value={att.cancelled} cls="text-slate-500" />
                 </div>
                 {att.gap < 0 && (
-                  <div className="mt-4 rounded-2xl bg-rose-50 text-rose-700 p-4 text-sm">
+                  <div className="mt-4 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 p-4 text-sm">
                     You're <strong>{Math.abs(att.gap)}%</strong> below the requirement
                     {subjectFilter !== "all" ? ` in ${activeSubjectTitle}` : ""}.
                   </div>

@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { LogOut, User, Percent, Info, MessageSquareHeart, ChevronRight } from "lucide-react";
+import { LogOut, User, Percent, Info, MessageSquareHeart, ChevronRight, Sparkles, Sun, Moon } from "lucide-react";
 
 import AppShell from "@/components/layout/AppShell";
 import ExportButton from "@/components/settings/ExportButton";
 import { api } from "@/api/apiClient";
 import { signOut, getSession, getStoredUser } from "@/lib/supabaseAuth";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [requiredPct, setRequiredPct] = useState(75);
   const [user, setUser] = useState(null);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const load = async () => {
@@ -74,6 +76,36 @@ export default function Settings() {
             </div>
           </div>
 
+          {/* Appearance */}
+          <div className="rounded-3xl bg-card border border-border/60 shadow-sm p-5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {theme === "dark" ? (
+                <Moon className="w-4 h-4 text-pink-500" />
+              ) : (
+                <Sun className="w-4 h-4 text-pink-500" />
+              )}
+              <span className="text-sm text-foreground">Dark mode</span>
+            </div>
+            <button
+  onClick={toggleTheme}
+  className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
+    theme === "dark" ? "bg-rose-500" : "bg-muted"
+  }`}
+>
+  <span
+    className={`flex items-center justify-center h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+      theme === "dark" ? "translate-x-6" : "translate-x-1"
+    }`}
+  >
+    {theme === "dark" ? (
+      <Moon className="w-3 h-3 text-rose-500" />
+    ) : (
+      <Sun className="w-3 h-3 text-amber-500" />
+    )}
+  </span>
+</button>
+          </div>
+
           {/* Data export */}
           <div className="rounded-3xl bg-card border border-border/60 shadow-sm p-5">
             <h2 className="text-sm font-semibold text-muted-foreground mb-1">Your data</h2>
@@ -95,6 +127,21 @@ export default function Settings() {
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-foreground">Send feedback</p>
               <p className="text-xs text-muted-foreground">Help us fix bugs and shape the launch</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+          </Link>
+
+          {/* Know the Dev */}
+          <Link
+            to="/about"
+            className="rounded-3xl bg-card border border-border/60 shadow-sm p-5 flex items-center gap-3 hover:bg-muted transition-colors"
+          >
+            <div className="w-10 h-10 rounded-2xl bg-pastelPink text-pastelPink-foreground grid place-items-center shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-foreground">Know the dev</p>
+              <p className="text-xs text-muted-foreground">A little about who built this</p>
             </div>
             <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
           </Link>
