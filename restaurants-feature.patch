@@ -1,0 +1,490 @@
+diff --git a/src/App.jsx b/src/App.jsx
+index 62ab767..bd41674 100644
+--- a/src/App.jsx
++++ b/src/App.jsx
+@@ -15,6 +15,7 @@ import WeeklyPlan from "./pages/WeeklyPlan";
+ import SubjectAttendance from "./pages/SubjectAttendance";
+ import Feedback from "./pages/Feedback";
+ import About from "./pages/About";
++import Restaurants from "./pages/Restaurants";
+ 
+ const routerBase = Capacitor.isNativePlatform() || import.meta.env.DEV || import.meta.env.VITE_HOST_ENV === 'cloudflare'
+   ? '/'
+@@ -84,6 +85,7 @@ function App() {
+         />
+         
+         <Route path="/schedule" element={session ? <Schedule /> : <Navigate to="/login" />} />
++        <Route path="/restaurants" element={session ? <Restaurants /> : <Navigate to="/login" />} />
+         <Route path="/settings" element={session ? <Settings /> : <Navigate to="/login" />} />
+         <Route path="/weekly-plan" element={session ? <WeeklyPlan /> : <Navigate to="/login" />} />
+         <Route path="/feedback" element={session ? <Feedback /> : <Navigate to="/login" />} />
+diff --git a/src/components/layout/AppShell.jsx b/src/components/layout/AppShell.jsx
+index 3a5ace7..52ccada 100644
+--- a/src/components/layout/AppShell.jsx
++++ b/src/components/layout/AppShell.jsx
+@@ -1,11 +1,12 @@
+ import React from "react";
+ import { NavLink } from "react-router-dom";
+-import { LayoutDashboard, CalendarDays, CheckSquare, ListTodo, Settings, Sparkles } from "lucide-react";
++import { LayoutDashboard, CalendarDays, CheckSquare, ListTodo, Settings, Sparkles, UtensilsCrossed } from "lucide-react";
+ 
+ const NAV = [
+   { to: "/", label: "Home", icon: LayoutDashboard, end: true },
+   { to: "/schedule", label: "Schedule", icon: CalendarDays },
+   { to: "/attendance", label: "Attend", icon: CheckSquare },
++  { to: "/restaurants", label: "Eats", icon: UtensilsCrossed },
+   { to: "/weekly-plan", label: "Plan", icon: ListTodo },
+   { to: "/settings", label: "Settings", icon: Settings }
+ ];
+diff --git a/src/components/shared/RestaurantDetailModal.jsx b/src/components/shared/RestaurantDetailModal.jsx
+new file mode 100644
+index 0000000..1469968
+--- /dev/null
++++ b/src/components/shared/RestaurantDetailModal.jsx
+@@ -0,0 +1,149 @@
++import React from "react";
++import { X, Star, MapPin, Phone, Bike, Navigation } from "lucide-react";
++import { getStatus, formatTime12 } from "@/lib/restaurants";
++
++export default function RestaurantDetailModal({ restaurant, onClose }) {
++  if (!restaurant) return null;
++  const { isOpen } = getStatus(restaurant);
++  const mapEmbedSrc = `https://www.google.com/maps?q=${restaurant.lat},${restaurant.lng}&output=embed`;
++  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${restaurant.lat},${restaurant.lng}`;
++
++  return (
++    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 p-0 sm:p-4">
++      <div className="w-full sm:max-w-md max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-card border border-border shadow-xl">
++        {/* Hero */}
++        <div
++          className="relative h-36 flex items-end p-5"
++          style={{
++            background: restaurant.photoUrl
++              ? `url(${restaurant.photoUrl}) center/cover`
++              : restaurant.accent,
++          }}
++        >
++          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent rounded-t-3xl" />
++          <button
++            type="button"
++            onClick={onClose}
++            className="absolute top-3 right-3 z-10 p-2 rounded-full bg-black/30 text-white hover:bg-black/45 transition-colors"
++          >
++            <X className="w-4 h-4" />
++          </button>
++          <div className="relative z-10">
++            <h2 className="text-xl font-heading font-bold text-white leading-tight">{restaurant.name}</h2>
++            <p className="text-white/75 text-xs mt-0.5">{restaurant.cuisine}</p>
++          </div>
++        </div>
++
++        <div className="p-6 space-y-5">
++          {/* Status + rating */}
++          <div className="flex items-center justify-between flex-wrap gap-2">
++            <span
++              className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ${
++                isOpen
++                  ? "bg-pastel-mint text-pastel-mint-foreground"
++                  : "bg-destructive/10 text-destructive"
++              }`}
++            >
++              <span className="w-1.5 h-1.5 rounded-full bg-current" />
++              {isOpen ? `Open now · closes ${formatTime12(restaurant.closesAt)}` : `Closed · opens ${formatTime12(restaurant.opensAt)}`}
++            </span>
++            <span className="inline-flex items-center gap-1 text-sm font-semibold text-foreground">
++              <Star className="w-3.5 h-3.5 fill-current text-pastel-yellow-foreground" />
++              {restaurant.rating.toFixed(1)}
++              <span className="text-muted-foreground font-normal">({restaurant.reviewCount} Google reviews)</span>
++            </span>
++          </div>
++
++          {/* Location */}
++          <div>
++            <p className="text-xs font-semibold text-muted-foreground mb-2">Location</p>
++            <div className="flex items-start justify-between gap-3">
++              <p className="text-sm text-foreground flex items-start gap-2 max-w-[22ch]">
++                <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground" />
++                {restaurant.address}
++              </p>
++              <a
++                href={directionsUrl}
++                target="_blank"
++                rel="noopener noreferrer"
++                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-2xl bg-primary text-primary-foreground whitespace-nowrap"
++              >
++                <Navigation className="w-3.5 h-3.5" />
++                Directions
++              </a>
++            </div>
++            <iframe
++              title={`Map for ${restaurant.name}`}
++              src={mapEmbedSrc}
++              className="w-full h-36 rounded-2xl border border-border mt-3"
++              loading="lazy"
++              referrerPolicy="no-referrer-when-downgrade"
++            />
++          </div>
++
++          {/* Contact */}
++          <div>
++            <p className="text-xs font-semibold text-muted-foreground mb-2">Contact</p>
++            <div className="rounded-2xl border border-border p-4 space-y-3">
++              <div className="flex items-center justify-between">
++                <div>
++                  <p className="text-[11px] text-muted-foreground">Owner</p>
++                  <p className="text-sm font-semibold text-foreground">{restaurant.ownerName}</p>
++                </div>
++              </div>
++              <div className="flex items-center justify-between">
++                <div>
++                  <p className="text-[11px] text-muted-foreground">Phone</p>
++                  <p className="text-sm font-semibold text-foreground">{restaurant.phone}</p>
++                </div>
++                <a
++                  href={`tel:${restaurant.phone}`}
++                  className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-2xl border border-border text-foreground"
++                >
++                  <Phone className="w-3.5 h-3.5" />
++                  Call
++                </a>
++              </div>
++            </div>
++          </div>
++
++          {/* Hostel delivery */}
++          <div
++            className={`rounded-2xl p-4 flex items-start gap-3 ${
++              restaurant.hostelDelivery ? "bg-pastel-mint/40" : "bg-muted"
++            }`}
++          >
++            <Bike className={`w-5 h-5 mt-0.5 ${restaurant.hostelDelivery ? "text-pastel-mint-foreground" : "text-muted-foreground"}`} />
++            <div>
++              <p className="text-sm font-semibold text-foreground">
++                {restaurant.hostelDelivery ? "Delivers to hostels" : "No hostel delivery"}
++              </p>
++              <p className="text-xs text-muted-foreground mt-0.5">
++                {restaurant.hostelDelivery
++                  ? `Approx delivery charge: ${restaurant.deliveryFeeApprox} — call to confirm and place your order`
++                  : "Pickup or dine-in only — call ahead if you plan to walk over"}
++              </p>
++            </div>
++          </div>
++
++          {/* Menu photo */}
++          <div>
++            <p className="text-xs font-semibold text-muted-foreground mb-2">Menu</p>
++            <div className="rounded-2xl border border-border overflow-hidden">
++              {restaurant.menuImageUrl ? (
++                <img src={restaurant.menuImageUrl} alt={`${restaurant.name} menu`} className="w-full h-40 object-cover" />
++              ) : (
++                <div className="w-full h-32 bg-muted flex items-center justify-center text-xs text-muted-foreground">
++                  No menu photo added yet
++                </div>
++              )}
++              <p className="text-[11px] text-muted-foreground px-3 py-2 bg-muted/60">
++                Add a real photo by setting menuImageUrl in src/lib/restaurants.js
++              </p>
++            </div>
++          </div>
++        </div>
++      </div>
++    </div>
++  );
++}
+diff --git a/src/lib/restaurants.js b/src/lib/restaurants.js
+new file mode 100644
+index 0000000..5a7b1f1
+--- /dev/null
++++ b/src/lib/restaurants.js
+@@ -0,0 +1,149 @@
++// Shared helpers + data for the Restaurants ("Campus Eats") page.
++//
++// ================================================================
++// ✦ RESTAURANT DIRECTORY — EDIT ONLY THE LIST BELOW ✦
++// To add a place: copy one whole { ... } block, paste it before the
++// closing "];", and change the values.
++// To remove a place: delete its whole { ... } block.
++// Nothing else in this file, or in Restaurants.jsx, needs to change.
++//
++// Field guide:
++//   id                - short unique code, no spaces (e.g. "r6")
++//   name              - restaurant / shop name
++//   cuisine           - short tag under the name, e.g. "Momos · Chinese"
++//   ownerName         - owner's name shown on the detail card
++//   phone             - phone number with country code, e.g. "+919876543210"
++//   address           - full address shown on the detail card
++//   lat, lng          - map coordinates (right-click the spot on Google
++//                       Maps and copy the two numbers it shows you)
++//   opensAt, closesAt - opening/closing time, 24-hour "HH:MM"
++//                       (overnight hours like 18:00-02:00 work automatically)
++//   closedOn          - weekly off days: 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu
++//                       5=Fri 6=Sat. Leave as [] if open every day.
++//   rating            - star rating out of 5, e.g. 4.3
++//                       (this is typed in by hand from Google, not pulled
++//                       live — update it every so often)
++//   reviewCount       - number of Google reviews, e.g. 214
++//   hostelDelivery    - true or false
++//   deliveryFeeApprox - approximate delivery charge as text, e.g. "₹20–30"
++//                       (leave as "" if hostelDelivery is false)
++//   photoUrl          - link to a photo of the restaurant, or "" to use
++//                       a plain placeholder tile
++//   menuImageUrl      - link to a photo of the menu, or "" to use a
++//                       placeholder
++//   accent            - hex color for the placeholder tile when there's
++//                       no photoUrl, e.g. "#C98A22"
++// ================================================================
++export const RESTAURANTS = [
++  {
++    id: "r1",
++    name: "Bora's Kitchen",
++    cuisine: "Home-style Assamese",
++    ownerName: "Diganta Bora",
++    phone: "+919864012345",
++    address: "Shop 4, College Road, Napaam, Tezpur",
++    lat: 26.7010, lng: 92.7930,
++    opensAt: "10:30", closesAt: "22:00", closedOn: [],
++    rating: 4.5, reviewCount: 212,
++    hostelDelivery: true, deliveryFeeApprox: "₹20–30",
++    photoUrl: "", menuImageUrl: "",
++    accent: "#C98A22",
++  },
++  {
++    id: "r2",
++    name: "Momo Point",
++    cuisine: "Momos · Chinese",
++    ownerName: "Tenzin Dorjee",
++    phone: "+919435098765",
++    address: "Near Main Gate, Tezpur University Road",
++    lat: 26.7042, lng: 92.7961,
++    opensAt: "12:00", closesAt: "21:30", closedOn: [1],
++    rating: 4.2, reviewCount: 98,
++    hostelDelivery: true, deliveryFeeApprox: "₹15–25",
++    photoUrl: "", menuImageUrl: "",
++    accent: "#B4574A",
++  },
++  {
++    id: "r3",
++    name: "The Tea Junction",
++    cuisine: "Tea stall · Snacks",
++    ownerName: "Ranjit Das",
++    phone: "+919864099887",
++    address: "Bus Stop Corner, Napaam Chariali",
++    lat: 26.6998, lng: 92.7902,
++    opensAt: "06:00", closesAt: "23:00", closedOn: [],
++    rating: 4.0, reviewCount: 340,
++    hostelDelivery: false, deliveryFeeApprox: "",
++    photoUrl: "", menuImageUrl: "",
++    accent: "#5E8B5A",
++  },
++  {
++    id: "r4",
++    name: "Spice Route Dhaba",
++    cuisine: "North Indian · Punjabi",
++    ownerName: "Harpreet Singh",
++    phone: "+919678123450",
++    address: "NH-15, Opposite Petrol Pump, Tezpur",
++    lat: 26.7085, lng: 92.8010,
++    opensAt: "11:00", closesAt: "23:30", closedOn: [],
++    rating: 4.6, reviewCount: 501,
++    hostelDelivery: true, deliveryFeeApprox: "₹30–50",
++    photoUrl: "", menuImageUrl: "",
++    accent: "#A6472F",
++  },
++  {
++    id: "r5",
++    name: "Night Owl Fast Food",
++    cuisine: "Rolls · Fast food",
++    ownerName: "Mridul Saikia",
++    phone: "+919101234567",
++    address: "Hostel Road Market, Block C",
++    lat: 26.7025, lng: 92.7889,
++    opensAt: "18:00", closesAt: "02:00", closedOn: [],
++    rating: 4.1, reviewCount: 76,
++    hostelDelivery: true, deliveryFeeApprox: "₹10–20",
++    photoUrl: "", menuImageUrl: "",
++    accent: "#3E6B8A",
++  },
++];
++// ============== END OF EDITABLE DATA — CODE BELOW ==============
++
++function timeToMin(t) {
++  const [h, m] = t.split(":").map(Number);
++  return h * 60 + m;
++}
++
++export function formatTime12(t) {
++  const [hStr, m] = t.split(":");
++  const h = Number(hStr);
++  const suffix = h >= 12 ? "pm" : "am";
++  const h12 = h % 12 === 0 ? 12 : h % 12;
++  return `${h12}${m === "00" ? "" : ":" + m}${suffix}`;
++}
++
++// Returns { isOpen, closedToday } for a restaurant, computed from the
++// current time. Handles overnight hours (e.g. 18:00 to 02:00).
++export function getStatus(restaurant) {
++  const now = new Date();
++  const day = now.getDay();
++  const nowMin = now.getHours() * 60 + now.getMinutes();
++  const openMin = timeToMin(restaurant.opensAt);
++  const closeMin = timeToMin(restaurant.closesAt);
++  const closedToday = (restaurant.closedOn || []).includes(day);
++
++  let isOpen;
++  if (closeMin > openMin) {
++    isOpen = nowMin >= openMin && nowMin < closeMin;
++  } else {
++    isOpen = nowMin >= openMin || nowMin < closeMin;
++  }
++  if (closedToday) isOpen = false;
++
++  return { isOpen, closedToday };
++}
++
++export function initialsOf(name) {
++  const parts = (name || "").trim().split(/\s+/).filter(Boolean);
++  if (!parts.length) return "?";
++  return (parts[0][0] + (parts[1]?.[0] || "")).toUpperCase();
++}
+diff --git a/src/pages/Restaurants.jsx b/src/pages/Restaurants.jsx
+new file mode 100644
+index 0000000..c886a37
+--- /dev/null
++++ b/src/pages/Restaurants.jsx
+@@ -0,0 +1,136 @@
++import React, { useMemo, useState } from "react";
++import { Search, Star } from "lucide-react";
++import AppShell from "@/components/layout/AppShell";
++import RestaurantDetailModal from "@/components/shared/RestaurantDetailModal";
++import { RESTAURANTS, getStatus, initialsOf } from "@/lib/restaurants";
++
++const FILTERS = [
++  { key: "all", label: "All places" },
++  { key: "open", label: "Open now" },
++  { key: "delivery", label: "Hostel delivery" },
++];
++
++export default function Restaurants() {
++  const [search, setSearch] = useState("");
++  const [filter, setFilter] = useState("all");
++  const [selectedId, setSelectedId] = useState(null);
++
++  const visible = useMemo(() => {
++    const term = search.trim().toLowerCase();
++    return RESTAURANTS.filter((r) => {
++      if (filter === "open" && !getStatus(r).isOpen) return false;
++      if (filter === "delivery" && !r.hostelDelivery) return false;
++      if (term && !`${r.name} ${r.cuisine}`.toLowerCase().includes(term)) return false;
++      return true;
++    });
++  }, [search, filter]);
++
++  const selected = RESTAURANTS.find((r) => r.id === selectedId) || null;
++
++  return (
++    <AppShell>
++      <div className="space-y-6">
++        <div>
++          <h1 className="text-2xl font-heading font-bold text-foreground">Restaurants</h1>
++          <p className="text-sm text-muted-foreground mt-1">
++            Numbers, hours and hostel delivery for places near campus — so you know who's open before you call.
++          </p>
++        </div>
++
++        <div className="relative">
++          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
++          <input
++            value={search}
++            onChange={(e) => setSearch(e.target.value)}
++            placeholder="Search by name or cuisine"
++            className="w-full rounded-2xl border border-border bg-background pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
++          />
++        </div>
++
++        <div className="flex gap-2 overflow-x-auto -mx-1 px-1">
++          {FILTERS.map((f) => (
++            <button
++              key={f.key}
++              type="button"
++              onClick={() => setFilter(f.key)}
++              className={`shrink-0 text-xs font-semibold px-3.5 py-2 rounded-full border transition-colors ${
++                filter === f.key
++                  ? "bg-primary text-primary-foreground border-primary"
++                  : "bg-card text-muted-foreground border-border"
++              }`}
++            >
++              {f.label}
++            </button>
++          ))}
++        </div>
++
++        {visible.length === 0 ? (
++          <div className="text-center py-16 text-muted-foreground">
++            <p className="text-sm font-medium text-foreground">No places match</p>
++            <p className="text-xs mt-1">Try a different search or filter.</p>
++          </div>
++        ) : (
++          <div className="grid gap-3">
++            {visible.map((r) => {
++              const { isOpen } = getStatus(r);
++              return (
++                <button
++                  key={r.id}
++                  type="button"
++                  onClick={() => setSelectedId(r.id)}
++                  className="flex items-center gap-3.5 text-left rounded-3xl bg-card border border-border p-3.5 hover:border-foreground/20 transition-colors"
++                >
++                  <div
++                    className="w-14 h-14 rounded-2xl shrink-0 grid place-items-center font-heading font-bold text-white text-base"
++                    style={{
++                      background: r.photoUrl ? undefined : r.accent,
++                      backgroundImage: r.photoUrl ? `url(${r.photoUrl})` : undefined,
++                      backgroundSize: "cover",
++                      backgroundPosition: "center",
++                    }}
++                  >
++                    {!r.photoUrl && initialsOf(r.name)}
++                  </div>
++
++                  <div className="min-w-0 flex-1">
++                    <div className="flex items-start justify-between gap-2">
++                      <div className="min-w-0">
++                        <p className="text-sm font-semibold text-foreground truncate">{r.name}</p>
++                        <p className="text-xs text-muted-foreground">{r.cuisine}</p>
++                      </div>
++                      <span
++                        className={`shrink-0 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
++                          isOpen
++                            ? "bg-pastel-mint text-pastel-mint-foreground"
++                            : "bg-destructive/10 text-destructive"
++                        }`}
++                      >
++                        <span className="w-1.5 h-1.5 rounded-full bg-current" />
++                        {isOpen ? "Open" : "Closed"}
++                      </span>
++                    </div>
++
++                    <div className="flex items-center gap-2 mt-2 flex-wrap">
++                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-foreground">
++                        <Star className="w-3 h-3 fill-current text-pastel-yellow-foreground" />
++                        {r.rating.toFixed(1)}
++                        <span className="text-muted-foreground font-normal">({r.reviewCount})</span>
++                      </span>
++                      {r.hostelDelivery && (
++                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
++                          Hostel delivery · ~{r.deliveryFeeApprox}
++                        </span>
++                      )}
++                    </div>
++                  </div>
++                </button>
++              );
++            })}
++          </div>
++        )}
++      </div>
++
++      {selected && <RestaurantDetailModal restaurant={selected} onClose={() => setSelectedId(null)} />}
++    </AppShell>
++  );
++}

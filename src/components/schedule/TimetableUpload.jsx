@@ -165,7 +165,7 @@ function downloadTemplate() {
   const sheet = XLSX.utils.aoa_to_sheet(rows);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, sheet, "Timetable");
-  XLSX.writeFile(workbook, "flow-tracker-timetable-template.xlsx");
+  XLSX.writeFile(workbook, "schedul-ulu-timetable-template.xlsx");
 }
 
 // ---- Import routines ----------------------------------------------------

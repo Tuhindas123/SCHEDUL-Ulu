@@ -1,12 +1,13 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, CalendarDays, CheckSquare, ListTodo, Settings, Sparkles } from "lucide-react";
+import { LayoutDashboard, CalendarDays, CheckSquare, ListTodo, Settings, Sparkles, UtensilsCrossed } from "lucide-react";
 
 const NAV = [
   { to: "/", label: "Home", icon: LayoutDashboard, end: true },
   { to: "/schedule", label: "Schedule", icon: CalendarDays },
   { to: "/attendance", label: "Attend", icon: CheckSquare },
   { to: "/weekly-plan", label: "Plan", icon: ListTodo },
+  { to: "/restaurants", label: "Eats", icon: UtensilsCrossed },
   { to: "/settings", label: "Settings", icon: Settings }
 ];
 

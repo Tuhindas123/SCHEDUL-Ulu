@@ -15,6 +15,7 @@ import WeeklyPlan from "./pages/WeeklyPlan";
 import SubjectAttendance from "./pages/SubjectAttendance";
 import Feedback from "./pages/Feedback";
 import About from "./pages/About";
+import Restaurants from "./pages/Restaurants";
 
 const routerBase = Capacitor.isNativePlatform() || import.meta.env.DEV || import.meta.env.VITE_HOST_ENV === 'cloudflare'
   ? '/'
@@ -86,9 +87,11 @@ function App() {
         <Route path="/schedule" element={session ? <Schedule /> : <Navigate to="/login" />} />
         <Route path="/settings" element={session ? <Settings /> : <Navigate to="/login" />} />
         <Route path="/weekly-plan" element={session ? <WeeklyPlan /> : <Navigate to="/login" />} />
+        <Route path="/restaurants" element={session ? <Restaurants /> : <Navigate to="/login" />} />
         <Route path="/feedback" element={session ? <Feedback /> : <Navigate to="/login" />} />
         <Route path="/about" element={session ? <About /> : <Navigate to="/login" />} />
         <Route path="*" element={<Navigate to="/" />} />
+        
       </Routes>
     </Router>
   );
