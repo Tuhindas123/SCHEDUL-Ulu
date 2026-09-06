@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { LayoutDashboard, CalendarDays, CheckSquare, ListTodo, Settings, Sparkles, UtensilsCrossed } from "lucide-react";
 
 const NAV = [
@@ -62,12 +62,19 @@ export default function AppShell({ children }) {
             ))}
           </nav>
 
-          <div className="mt-auto p-4">
+          <div className="mt-auto p-4 space-y-3">
             <div className="rounded-2xl bg-white/5 p-4">
               <p className="text-xs text-sidebar-foreground/60 leading-snug">
                 Keep your attendance on track, one class at a time.
               </p>
             </div>
+            {/* Privacy — quiet footer link, extreme bottom of sidebar */}
+            <Link
+              to="/privacy"
+              className="block text-center text-[11px] text-sidebar-foreground/35 hover:text-sidebar-foreground/60 transition-colors py-1"
+            >
+              Privacy Policy
+            </Link>
           </div>
         </aside>
 
@@ -80,14 +87,13 @@ export default function AppShell({ children }) {
         </header>
 
         {/* Main */}
-        <main className="flex-1 min-w-0 px-4 lg:px-0 pb-24 lg:pb-8 pt-4 lg:pt-0">
+        <main className="flex-1 min-w-0 px-4 lg:px-0 pb-28 lg:pb-8 pt-4 lg:pt-0">
           {children}
         </main>
 
-        {/* Mobile bottom tab bar — app-like */}
+        {/* Mobile bottom tab bar — app-like, floating pill */}
         <nav
-          className="lg:hidden fixed bottom-3 inset-x-3 z-50 bg-sidebar rounded-3xl flex justify-around px-2 py-1"
-          style={{ paddingBottom: "env(safe-area-inset-bottom, 6px)" }}
+          className="lg:hidden fixed bottom-8 inset-x-3 z-50 bg-sidebar rounded-3xl flex justify-around px-2 py-1"
         >
           {NAV.map(({ to, label, icon: Icon, end }) => (
             <NavLink
@@ -115,6 +121,19 @@ export default function AppShell({ children }) {
             </NavLink>
           ))}
         </nav>
+
+        {/* Privacy — pinned to the absolute bottom edge of the screen on mobile */}
+        <div
+          className="lg:hidden fixed bottom-0 inset-x-0 z-40 flex justify-center pb-1"
+          style={{ paddingBottom: "env(safe-area-inset-bottom, 2px)" }}
+        >
+          <Link
+            to="/privacy"
+            className="text-[10px] text-muted-foreground/50 hover:text-muted-foreground transition-colors py-1"
+          >
+            Privacy Policy
+          </Link>
+        </div>
       </div>
     </div>
   );

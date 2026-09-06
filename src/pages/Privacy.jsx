@@ -1,8 +1,21 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 export default function Privacy() {
+  const navigate = useNavigate();
+
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12 text-gray-800 font-sans min-h-screen">
+    <div className="max-w-4xl mx-auto px-6 py-8 text-gray-800 font-sans min-h-screen">
+      {/* Back Button Bar */}
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 mb-6 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back
+      </button>
+
       <h1 className="text-3xl font-bold mb-2 text-gray-900">Privacy Policy</h1>
       <p className="text-sm text-gray-500 mb-8">Last Updated: September 2026</p>
 

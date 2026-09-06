@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { LogOut, User, Percent, Info, MessageSquareHeart, ChevronRight, Sparkles, Sun, Moon } from "lucide-react";
+import { LogOut, User, Percent, Info, MessageSquareHeart, ChevronRight, Sparkles, Sun, Moon, ShieldCheck } from "lucide-react";
 
 import AppShell from "@/components/layout/AppShell";
 import ExportButton from "@/components/settings/ExportButton";
@@ -142,6 +142,20 @@ export default function Settings() {
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-foreground">Know the dev</p>
               <p className="text-xs text-muted-foreground">A little about who built this</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+          </Link>
+          {/* Privacy */}
+          <Link
+            to="/privacy"
+            className="rounded-3xl bg-card border border-border/60 shadow-sm p-5 flex items-center gap-3 hover:bg-muted transition-colors"
+          >
+            <div className="w-10 h-10 rounded-2xl bg-pastelPink text-pastelPink-foreground grid place-items-center shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-foreground">Privacy policy</p>
+              <p className="text-xs text-muted-foreground">How your data is handled</p>
             </div>
             <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
           </Link>
