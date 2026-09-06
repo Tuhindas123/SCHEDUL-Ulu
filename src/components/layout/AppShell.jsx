@@ -75,6 +75,12 @@ export default function AppShell({ children }) {
             >
               Privacy Policy
             </Link>
+            <Link
+              to="/terms"
+              className="block text-center text-[11px] text-sidebar-foreground/35 hover:text-sidebar-foreground/60 transition-colors py-1"
+            >
+              Terms of Service
+            </Link>
           </div>
         </aside>
 
@@ -132,6 +138,12 @@ export default function AppShell({ children }) {
             className="text-[10px] text-muted-foreground/50 hover:text-muted-foreground transition-colors py-1"
           >
             Privacy Policy
+          </Link>
+                    <Link
+            to="/terms"
+            className="text-[10px] text-muted-foreground/50 hover:text-muted-foreground transition-colors py-1"
+          >
+            Terms of Service
           </Link>
         </div>
       </div>
