@@ -7,6 +7,27 @@
 // To remove a place: delete its whole { ... } block.
 // Nothing else in this file, or in Restaurants.jsx, needs to change.
 //
+// ================================================================
+// ✦ HOW TO ADD A PHOTO (photoUrl) ✦
+// photoUrl needs a direct link to an image file — one that ends in
+// .jpg/.png/.webp and opens as JUST the picture in a browser tab,
+// not a webpage.
+//
+// Easiest ways to get one:
+//   1. From your phone: upload the photo to https://imgur.com/upload
+//      (no account needed) → right-click the uploaded image →
+//      "Copy image address" → paste that as photoUrl below.
+//   2. From this project: drop the image file into the /public folder
+//      (e.g. public/restaurant-photos/cooking-star.jpg), then use
+//      photoUrl: "/restaurant-photos/cooking-star.jpg"
+//
+// Example:
+//   photoUrl: "https://i.imgur.com/AbCdEfG.jpg",
+//
+// Leave photoUrl: "" (empty) if you don't have a photo yet — the app
+// will automatically show the Schedul-Ulu logo as a placeholder
+// instead, so nothing looks broken while you're still collecting photos.
+//
 // Field guide:
 //   id                - short unique code, no spaces (e.g. "r6")
 //   name              - restaurant / shop name
@@ -20,47 +41,34 @@
 //                       (overnight hours like 18:00-02:00 work automatically)
 //   closedOn          - weekly off days: 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu
 //                       5=Fri 6=Sat. Leave as [] if open every day.
-//   rating            - star rating out of 5, e.g. 4.3
-//                       (this is typed in by hand from Google, not pulled
-//                       live — update it every so often)
-//   reviewCount       - number of Google reviews, e.g. 214
 //   hostelDelivery    - true or false
 //   deliveryFeeApprox - approximate delivery charge as text, e.g. "₹20–30"
 //                       (leave as "" if hostelDelivery is false)
-//   photoUrl          - link to a photo of the restaurant, or "" to use
-//                       a plain placeholder tile
+//   photoUrl          - link to a photo of the restaurant, see guide
+//                       above. Leave as "" to show the logo placeholder.
 //   menuImageUrl      - link to a photo of the menu, or "" to use a
 //                       placeholder
-//   accent            - hex color for the placeholder tile when there's
-//                       no photoUrl, e.g. "#C98A22"
 // ================================================================
 export const RESTAURANTS = [
   {
     id: "r1",
     name: "Cooking star Restaurant",
-    ownerName: "Diganta Bora",
-    phone: "+919864012345",
+    phone: "",
     address: "MRWP+F7W, University, Napaam, Tezpur, Parmai Gauli Gaon, Assam 784028",
-    lat: 26.7010, lng: 92.7930,
+    lat: 26.69624948342062, lng: 92.8356704253021,
     opensAt: "10:30", closesAt: "22:00", closedOn: [],
-    rating: 4.5, reviewCount: 212,
     hostelDelivery: true, deliveryFeeApprox: "₹20–30",
     photoUrl: "", menuImageUrl: "",
-    accent: "#C98A22",
   },
   {
     id: "r2",
-    name: "Momo Point",
-    cuisine: "Momos · Chinese",
-    ownerName: "Tenzin Dorjee",
-    phone: "+919435098765",
-    address: "Near Main Gate, Tezpur University Road",
-    lat: 26.7042, lng: 92.7961,
-    opensAt: "12:00", closesAt: "21:30", closedOn: [1],
-    rating: 4.2, reviewCount: 98,
+    name: "SRISHTI RESTAURANT",
+    phone: "+919365419001",
+    address: "MRWP+CCQ, Napaam, Parmai Gauli Gaon, Assam 784028",
+    lat: 26.6960895, lng: 92.8359627,
+    opensAt: "8:00", closesAt: "22:00", closedOn: [1],
     hostelDelivery: true, deliveryFeeApprox: "₹15–25",
-    photoUrl: "", menuImageUrl: "",
-    accent: "#B4574A",
+    photoUrl: "/food/srishti-restaurant.png", menuImageUrl: "",
   },
   {
     id: "r3",
@@ -71,10 +79,8 @@ export const RESTAURANTS = [
     address: "Bus Stop Corner, Napaam Chariali",
     lat: 26.6998, lng: 92.7902,
     opensAt: "06:00", closesAt: "23:00", closedOn: [],
-    rating: 4.0, reviewCount: 340,
     hostelDelivery: false, deliveryFeeApprox: "",
     photoUrl: "", menuImageUrl: "",
-    accent: "#5E8B5A",
   },
   {
     id: "r4",
@@ -85,10 +91,8 @@ export const RESTAURANTS = [
     address: "NH-15, Opposite Petrol Pump, Tezpur",
     lat: 26.7085, lng: 92.8010,
     opensAt: "11:00", closesAt: "23:30", closedOn: [],
-    rating: 4.6, reviewCount: 501,
     hostelDelivery: true, deliveryFeeApprox: "₹30–50",
     photoUrl: "", menuImageUrl: "",
-    accent: "#A6472F",
   },
   {
     id: "r5",
@@ -99,10 +103,8 @@ export const RESTAURANTS = [
     address: "Hostel Road Market, Block C",
     lat: 26.7025, lng: 92.7889,
     opensAt: "18:00", closesAt: "02:00", closedOn: [],
-    rating: 4.1, reviewCount: 76,
     hostelDelivery: true, deliveryFeeApprox: "₹10–20",
     photoUrl: "", menuImageUrl: "",
-    accent: "#3E6B8A",
   },
 ];
 // ============== END OF EDITABLE DATA — CODE BELOW ==============

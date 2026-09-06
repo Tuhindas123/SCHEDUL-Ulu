@@ -19,6 +19,7 @@ import Privacy from './pages/Privacy';
 import Restaurants from "./pages/Restaurants";
 import Terms from './pages/Terms';
 import Legal from "./pages/Legal";
+import Medicines from "./pages/Medicines";
 
 const routerBase = Capacitor.isNativePlatform() || import.meta.env.DEV || import.meta.env.VITE_HOST_ENV === 'cloudflare'
   ? '/'
@@ -97,6 +98,7 @@ function App() {
         {/* Public Privacy Route (accessible both logged in and logged out) */}
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
+        <Route path="/medicines" element={session ? <Medicines /> : <Navigate to="/login" />} />
 
         {/* Wildcard MUST remain the very last route */}
         <Route path="*" element={<Navigate to="/" />} />

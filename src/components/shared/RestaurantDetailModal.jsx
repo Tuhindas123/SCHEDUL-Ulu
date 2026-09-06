@@ -1,6 +1,8 @@
 import React from "react";
-import { X, Star, MapPin, Phone, Bike, Navigation } from "lucide-react";
+import { X, MapPin, Phone, Bike, Navigation } from "lucide-react";
 import { getStatus, formatTime12 } from "@/lib/restaurants";
+
+const FALLBACK_IMAGE = "/app_logo_original.png";
 
 export default function RestaurantDetailModal({ restaurant, onClose }) {
   if (!restaurant) return null;
@@ -13,11 +15,9 @@ export default function RestaurantDetailModal({ restaurant, onClose }) {
       <div className="w-full sm:max-w-md max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-card border border-border shadow-xl">
         {/* Hero */}
         <div
-          className="relative h-36 flex items-end p-5"
+          className="relative h-36 flex items-end p-5 bg-cover bg-center"
           style={{
-            background: restaurant.photoUrl
-              ? `url(${restaurant.photoUrl}) center/cover`
-              : restaurant.accent,
+            backgroundImage: `url(${restaurant.photoUrl || FALLBACK_IMAGE})`,
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent rounded-t-3xl" />
@@ -35,7 +35,7 @@ export default function RestaurantDetailModal({ restaurant, onClose }) {
         </div>
 
         <div className="p-6 space-y-5">
-          {/* Status + rating */}
+          {/* Status */}
           <div className="flex items-center justify-between flex-wrap gap-2">
             <span
               className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ${
@@ -46,11 +46,6 @@ export default function RestaurantDetailModal({ restaurant, onClose }) {
             >
               <span className="w-1.5 h-1.5 rounded-full bg-current" />
               {isOpen ? `Open now · closes ${formatTime12(restaurant.closesAt)}` : `Closed · opens ${formatTime12(restaurant.opensAt)}`}
-            </span>
-            <span className="inline-flex items-center gap-1 text-sm font-semibold text-foreground">
-              <Star className="w-3.5 h-3.5 fill-current text-pastel-yellow-foreground" />
-              {restaurant.rating.toFixed(1)}
-              <span className="text-muted-foreground font-normal">({restaurant.reviewCount} Google reviews)</span>
             </span>
           </div>
 
@@ -85,12 +80,6 @@ export default function RestaurantDetailModal({ restaurant, onClose }) {
           <div>
             <p className="text-xs font-semibold text-muted-foreground mb-2">Contact</p>
             <div className="rounded-2xl border border-border p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[11px] text-muted-foreground">Owner</p>
-                  <p className="text-sm font-semibold text-foreground">{restaurant.ownerName}</p>
-                </div>
-              </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[11px] text-muted-foreground">Phone</p>

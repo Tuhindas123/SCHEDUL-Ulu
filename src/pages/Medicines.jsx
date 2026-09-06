@@ -1,42 +1,43 @@
 import React, { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Clock } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
-import RestaurantDetailModal from "@/components/shared/RestaurantDetailModal";
-import { RESTAURANTS, getStatus } from "@/lib/restaurants";
+import MedicineDetailModal from "@/components/shared/MedicineDetailModal";
+import { MEDICINES, getMedStatus } from "@/lib/medicines";
 
 const FILTERS = [
-  { key: "all", label: "All places" },
+  { key: "all", label: "All pharmacies" },
   { key: "open", label: "Open now" },
-  { key: "delivery", label: "Hostel delivery" },
+  { key: "24h", label: "24-hour" },
+  { key: "delivery", label: "Home delivery" },
 ];
 
-// Shown for any restaurant that doesn't have a photoUrl yet.
 const FALLBACK_IMAGE = "/app_logo_original.png";
 
-export default function Restaurants() {
+export default function Medicines() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [selectedId, setSelectedId] = useState(null);
 
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase();
-    return RESTAURANTS.filter((r) => {
-      if (filter === "open" && !getStatus(r).isOpen) return false;
-      if (filter === "delivery" && !r.hostelDelivery) return false;
-      if (term && !`${r.name} ${r.cuisine}`.toLowerCase().includes(term)) return false;
+    return MEDICINES.filter((m) => {
+      if (filter === "open" && !getMedStatus(m).isOpen) return false;
+      if (filter === "24h" && !m.open24Hours) return false;
+      if (filter === "delivery" && !m.homeDelivery) return false;
+      if (term && !m.name.toLowerCase().includes(term)) return false;
       return true;
     }).sort((a, b) => a.name.localeCompare(b.name));
   }, [search, filter]);
 
-  const selected = RESTAURANTS.find((r) => r.id === selectedId) || null;
+  const selected = MEDICINES.find((m) => m.id === selectedId) || null;
 
   return (
     <AppShell>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-heading font-bold text-foreground">Restaurants</h1>
+          <h1 className="text-2xl font-heading font-bold text-foreground">Medicines</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Numbers, hours and hostel delivery for places near campus — so you know who's open before you call.
+            Pharmacies near campus, their hours, and who delivers — so you know where to go before you need it.
           </p>
         </div>
 
@@ -45,7 +46,7 @@ export default function Restaurants() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name or cuisine"
+            placeholder="Search by name"
             className="w-full rounded-2xl border border-border bg-background pl-10 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
           />
         </div>
@@ -69,32 +70,34 @@ export default function Restaurants() {
 
         {visible.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
-            <p className="text-sm font-medium text-foreground">No places match</p>
+            <p className="text-sm font-medium text-foreground">No pharmacies match</p>
             <p className="text-xs mt-1">Try a different search or filter.</p>
           </div>
         ) : (
           <div className="grid gap-3">
-            {visible.map((r) => {
-              const { isOpen } = getStatus(r);
+            {visible.map((m) => {
+              const { isOpen } = getMedStatus(m);
               return (
                 <button
-                  key={r.id}
+                  key={m.id}
                   type="button"
-                  onClick={() => setSelectedId(r.id)}
+                  onClick={() => setSelectedId(m.id)}
                   className="flex items-center gap-3.5 text-left rounded-3xl bg-card border border-border p-3.5 hover:border-foreground/20 transition-colors"
                 >
                   <div
                     className="w-14 h-14 rounded-2xl shrink-0 bg-muted bg-cover bg-center"
-                    style={{
-                      backgroundImage: `url(${r.photoUrl || FALLBACK_IMAGE})`,
-                    }}
+                    style={{ backgroundImage: `url(${m.photoUrl || FALLBACK_IMAGE})` }}
                   />
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-foreground truncate">{r.name}</p>
-                        <p className="text-xs text-muted-foreground">{r.cuisine}</p>
+                        <p className="text-sm font-semibold text-foreground truncate">{m.name}</p>
+                        {m.open24Hours && (
+                          <p className="text-xs text-teal-600 font-medium flex items-center gap-1 mt-0.5">
+                            <Clock className="w-3 h-3" /> Open 24 hours
+                          </p>
+                        )}
                       </div>
                       <span
                         className={`shrink-0 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
@@ -108,13 +111,18 @@ export default function Restaurants() {
                       </span>
                     </div>
 
-                    {r.hostelDelivery && (
-                      <div className="flex items-center gap-2 mt-2 flex-wrap">
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                          Hostel delivery · ~{r.deliveryFeeApprox}
+                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                      {m.emergencyMeds && (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">
+                          Emergency meds
                         </span>
-                      </div>
-                    )}
+                      )}
+                      {m.homeDelivery && (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                          Home delivery · ~{m.deliveryFeeApprox}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </button>
               );
@@ -123,7 +131,7 @@ export default function Restaurants() {
         )}
       </div>
 
-      {selected && <RestaurantDetailModal restaurant={selected} onClose={() => setSelectedId(null)} />}
+      {selected && <MedicineDetailModal pharmacy={selected} onClose={() => setSelectedId(null)} />}
     </AppShell>
   );
 }
