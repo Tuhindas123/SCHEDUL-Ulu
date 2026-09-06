@@ -8,6 +8,7 @@ import {
   Settings,
   Sparkles,
   UtensilsCrossed,
+  Pill,
   Menu,
   AlignLeft,
   X,
@@ -33,8 +34,8 @@ const NAV_GROUPS = [
     section: "Essentials",
     items: [
       { to: "/restaurants", label: "Eats", icon: UtensilsCrossed },
+      { to: "/medicines", label: "Meds", icon: Pill },
       // Add future items here, e.g.:
-      // { to: "/medicines", label: "Medicines", icon: Pill },
     ],
   },
   {
