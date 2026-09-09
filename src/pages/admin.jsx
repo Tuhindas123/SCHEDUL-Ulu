@@ -4,6 +4,7 @@ import { Users, BookOpen, UserPlus, Trash2, ShieldAlert } from "lucide-react";
 import { api } from "@/api/apiClient";
 import { classifyEmail } from "@/lib/emailClassifier";
 import AppShell from "@/components/layout/AppShell";
+import { usePreviewRole } from "@/contexts/PreviewRoleContext";
 
 const inputCls =
   "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400";
@@ -15,23 +16,8 @@ const ROLE_CHIP = {
 };
 
 export default function Admin() {
-  const [role, setRole] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { effectiveRole: role, loading } = usePreviewRole();
   const [tab, setTab] = useState("sections");
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const profile = await api.getMyProfile();
-        setRole(profile?.role || "student");
-      } catch (err) {
-        console.error("Failed to load profile:", err);
-        setRole("student");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
 
   if (loading) {
     return (

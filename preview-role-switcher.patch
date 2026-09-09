@@ -1,7 +1,3 @@
-diff --git a/src/components/attendance/teacherRollCall.jsx b/src/components/attendance/TeacherRollCall.jsx
-similarity index 100%
-rename from src/components/attendance/teacherRollCall.jsx
-rename to src/components/attendance/TeacherRollCall.jsx
 diff --git a/src/components/layout/AppShell.jsx b/src/components/layout/AppShell.jsx
 index bd28257..54f1160 100644
 --- a/src/components/layout/AppShell.jsx
@@ -249,22 +245,19 @@ index ecfabe3..1cfc2a8 100644
    </ThemeProvider>
  );
 \ No newline at end of file
-diff --git a/src/pages/admin.jsx b/src/pages/Admin.jsx
-similarity index 97%
-rename from src/pages/admin.jsx
-rename to src/pages/Admin.jsx
-index 041e9ef..f86f093 100644
+diff --git a/src/pages/admin.jsx b/src/pages/admin.jsx
+index 761ccec..f248f59 100644
 --- a/src/pages/admin.jsx
-+++ b/src/pages/Admin.jsx
-@@ -3,6 +3,7 @@ import { Users, BookOpen, UserPlus, Trash2, ShieldAlert } from "lucide-react";
- 
++++ b/src/pages/admin.jsx
+@@ -4,6 +4,7 @@ import { Users, BookOpen, UserPlus, Trash2, ShieldAlert } from "lucide-react";
  import { api } from "@/api/apiClient";
+ import { classifyEmail } from "@/lib/emailClassifier";
  import AppShell from "@/components/layout/AppShell";
 +import { usePreviewRole } from "@/contexts/PreviewRoleContext";
  
  const inputCls =
    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400";
-@@ -14,24 +15,9 @@ const ROLE_CHIP = {
+@@ -15,24 +16,9 @@ const ROLE_CHIP = {
  };
  
  export default function Admin() {

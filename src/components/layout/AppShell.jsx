@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -12,7 +12,8 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { api } from "@/api/apiClient";
+import { usePreviewRole } from "@/contexts/PreviewRoleContext";
+import { PreviewRoleSwitcher, PreviewRoleBanner } from "@/components/layout/PreviewRoleSwitcher";
 
 // Shared grouped nav — used by both the desktop sidebar and the
 // mobile slide-out menu. Add new items to an existing group, or add
@@ -105,15 +106,9 @@ function DrawerLink({ to, label, icon: Icon, end, onNavigate }) {
 
 export default function AppShell({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [role, setRole] = useState(null);
+  const { effectiveRole } = usePreviewRole();
 
-  useEffect(() => {
-    api.getMyProfile()
-      .then((profile) => setRole(profile?.role || "student"))
-      .catch(() => setRole("student"));
-  }, []);
-
-  const NAV_GROUPS = navGroups(role);
+  const NAV_GROUPS = navGroups(effectiveRole);
 
   return (
     <div className="min-h-screen bg-[hsl(var(--background))]">
@@ -150,6 +145,7 @@ export default function AppShell({ children }) {
           </div>
 
           <div className="mt-auto p-4 space-y-3">
+            <PreviewRoleSwitcher />
             <div className="rounded-2xl bg-white/5 p-4">
               <p className="text-xs text-sidebar-foreground/60 leading-snug">
                 Keep your attendance on track, one class at a time.
@@ -184,6 +180,7 @@ export default function AppShell({ children }) {
 
         {/* Main */}
         <main className="flex-1 min-w-0 px-4 lg:px-0 pb-8 pt-4 lg:pt-0">
+          <PreviewRoleBanner />
           {children}
         </main>
 
@@ -228,6 +225,10 @@ export default function AppShell({ children }) {
                     </nav>
                   </div>
                 ))}
+              </div>
+
+              <div className="px-4 pt-1">
+                <PreviewRoleSwitcher />
               </div>
 
               <div className="mt-auto px-4 py-4 border-t border-white/10">
