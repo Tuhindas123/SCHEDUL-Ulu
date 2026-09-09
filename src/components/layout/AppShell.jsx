@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, Link } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -8,41 +8,48 @@ import {
   Settings,
   Sparkles,
   UtensilsCrossed,
-  Pill,
+  ShieldCheck,
   Menu,
-  AlignLeft,
   X,
 } from "lucide-react";
+import { api } from "@/api/apiClient";
 
 // Shared grouped nav — used by both the desktop sidebar and the
 // mobile slide-out menu. Add new items to an existing group, or add
 // a new { section: "Name", items: [...] } block for a new group.
-const NAV_GROUPS = [
-  {
-    section: "General",
-    items: [{ to: "/", label: "Home", icon: LayoutDashboard, end: true }],
-  },
-  {
-    section: "Academics",
-    items: [
-      { to: "/schedule", label: "Schedule", icon: CalendarDays },
-      { to: "/attendance", label: "Attend", icon: CheckSquare },
-      { to: "/weekly-plan", label: "Plan", icon: ListTodo },
-    ],
-  },
-  {
-    section: "Essentials",
-    items: [
-      { to: "/restaurants", label: "Eats", icon: UtensilsCrossed },
-      { to: "/medicines", label: "Meds", icon: Pill },
-      // Add future items here, e.g.:
-    ],
-  },
-  {
-    section: null,
-    items: [{ to: "/settings", label: "Settings", icon: Settings }],
-  },
-];
+function navGroups(role) {
+  return [
+    {
+      section: "General",
+      items: [{ to: "/", label: "Home", icon: LayoutDashboard, end: true }],
+    },
+    {
+      section: "Academics",
+      items: [
+        { to: "/schedule", label: "Schedule", icon: CalendarDays },
+        { to: "/attendance", label: "Attend", icon: CheckSquare },
+        { to: "/weekly-plan", label: "Plan", icon: ListTodo },
+      ],
+    },
+    {
+      section: "Essentials",
+      items: [
+        { to: "/restaurants", label: "Eats", icon: UtensilsCrossed },
+        // Add future items here, e.g.:
+        // { to: "/medicines", label: "Medicines", icon: Pill },
+      ],
+    },
+    // Only teachers/admins get the Admin link — students never see a
+    // dead-end nav item, even though the page itself also gates by role.
+    ...(role === "teacher" || role === "admin"
+      ? [{ section: "Manage", items: [{ to: "/admin", label: "Admin", icon: ShieldCheck }] }]
+      : []),
+    {
+      section: null,
+      items: [{ to: "/settings", label: "Settings", icon: Settings }],
+    },
+  ];
+}
 
 function SidebarLink({ to, label, icon: Icon, end }) {
   return (
@@ -98,6 +105,15 @@ function DrawerLink({ to, label, icon: Icon, end, onNavigate }) {
 
 export default function AppShell({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [role, setRole] = useState(null);
+
+  useEffect(() => {
+    api.getMyProfile()
+      .then((profile) => setRole(profile?.role || "student"))
+      .catch(() => setRole("student"));
+  }, []);
+
+  const NAV_GROUPS = navGroups(role);
 
   return (
     <div className="min-h-screen bg-[hsl(var(--background))]">
@@ -149,22 +165,22 @@ export default function AppShell({ children }) {
         </aside>
 
         {/* Mobile top bar — sticky, with hamburger trigger */}
-        <header className="lg:hidden sticky top-0 z-40 flex items-center gap-2 px-4 py-3 bg-[hsl(var(--background))]/90 backdrop-blur-md border-b border-border/60">
-  <button
-    type="button"
-    onClick={() => setMenuOpen(true)}
-    className="p-2 rounded-xl hover:bg-muted transition-colors"
-    aria-label="Open menu"
-  >
-    <AlignLeft className="w-5 h-5 text-foreground" />
-  </button>
-  <div className="flex items-center gap-2">
-    <div className="w-8 h-8 rounded-xl bg-sidebar text-white grid place-items-center">
-      <Sparkles className="w-4 h-4" />
-    </div>
-    <p className="font-heading font-bold text-foreground text-sm">Schedul-Ulu</p>
-  </div>
-</header>
+        <header className="lg:hidden sticky top-0 z-40 flex items-center justify-between gap-2 px-4 py-3 bg-[hsl(var(--background))]/90 backdrop-blur-md border-b border-border/60">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-sidebar text-white grid place-items-center">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <p className="font-heading font-bold text-foreground text-sm">Schedul-Ulu</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            className="p-2 rounded-xl hover:bg-muted transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5 text-foreground" />
+          </button>
+        </header>
 
         {/* Main */}
         <main className="flex-1 min-w-0 px-4 lg:px-0 pb-8 pt-4 lg:pt-0">
@@ -174,7 +190,7 @@ export default function AppShell({ children }) {
         {/* Mobile slide-out menu — Supabase-panel style: dark bg,
             small uppercase section labels, thin dividers between groups */}
         {menuOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 flex justify-start">
+          <div className="lg:hidden fixed inset-0 z-50 flex justify-end">
             <div
               className="absolute inset-0 bg-black/50"
               onClick={() => setMenuOpen(false)}

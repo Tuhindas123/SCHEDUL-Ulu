@@ -47,6 +47,22 @@ export const api = {
   // Use this in a page's useEffect to auto-refresh when another device
   // (phone or browser) changes the same data.
   subscribe: (entity, onChange) => supabaseData.subscribeToTable(entity, onChange),
+
+  // ERP: roles, sections, rosters, teacher roll-call
+  getMyProfile: () => supabaseData.getMyProfile(),
+  getMySections: () => supabaseData.getMySections(),
+  getRoster: (sectionId) => supabaseData.getRoster(sectionId),
+  markAttendanceBulk: (sectionId, date, sessionTitle, entries) =>
+    supabaseData.markAttendanceBulk(sectionId, date, sessionTitle, entries),
+  getNotifications: () => supabaseData.getMyNotifications(),
+
+  // ERP: admin tools (people, sections, enrollments)
+  listAllProfiles: () => supabaseData.listAllProfiles(),
+  setUserRole: (userId, role) => supabaseData.setUserRole(userId, role),
+  listAllSections: () => supabaseData.listAllSections(),
+  createSection: (name, department, teacherId) => supabaseData.createSection(name, department, teacherId),
+  deleteSection: (sectionId) => supabaseData.deleteSection(sectionId),
+  getEnrollmentsForSection: (sectionId) => supabaseData.getEnrollmentsForSection(sectionId),
+  enrollStudent: (sectionId, userId) => supabaseData.enrollStudent(sectionId, userId),
+  unenroll: (enrollmentId) => supabaseData.unenroll(enrollmentId),
 };
-
-

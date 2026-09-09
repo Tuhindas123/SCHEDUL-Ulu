@@ -10,8 +10,8 @@ import {
 import { api } from "@/api/apiClient";
 import AppShell from "@/components/layout/AppShell";
 import AttendanceRing from "@/components/dashboard/AttendanceRing";
-import SubjectSelect from "@/components/shared/SubjectSelect";
 import DatePicker from "@/components/shared/DatePicker";
+import TeacherRollCall from "@/components/attendance/TeacherRollCall";
 import { computeAttendance } from "@/lib/studentUtils";
 
 const STATUS_META = {
@@ -62,6 +62,7 @@ export default function Attendance() {
   const [records, setRecords] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [setting, setSetting] = useState(null);
+  const [role, setRole] = useState(null);
 
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -71,10 +72,11 @@ export default function Attendance() {
   const load = async () => {
     try {
       setLoading(true);
-      const [recordsData, subjectsData, settingsData] = await Promise.all([
+      const [recordsData, subjectsData, settingsData, profile] = await Promise.all([
         api.getAttendanceRecords(),
         api.getSubjects(),
         api.getSyncSettings(),
+        api.getMyProfile(),
       ]);
       const sortedRecords = (recordsData || []).sort((a, b) =>
         String(b.date || "").localeCompare(String(a.date || ""))
@@ -82,6 +84,7 @@ export default function Attendance() {
       setRecords(sortedRecords);
       setSubjects(subjectsData || []);
       setSetting(settingsData?.[0] || null);
+      setRole(profile?.role || "student");
     } catch (error) {
       console.error("Failed to load attendance data:", error);
     } finally {
@@ -141,15 +144,21 @@ export default function Attendance() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-foreground">Attendance</h1>
-            <p className="text-sm text-muted-foreground mt-1">Keep every subject above {required}% to sit exams.</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {role === "teacher" || role === "admin"
+                ? "Take roll call for your classes."
+                : `Keep every subject above ${required}% to sit exams.`}
+            </p>
           </div>
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-500 text-white font-medium shadow-lg shadow-pink-500/25 hover:bg-pink-600 transition-colors"
-          >
-            <span className="text-lg">+</span>
-            Log entry
-          </button>
+          {(role === "teacher" || role === "admin") && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-500 text-white font-medium shadow-lg shadow-pink-500/25 hover:bg-pink-600 transition-colors"
+            >
+              <span className="text-lg">+</span>
+              Take attendance
+            </button>
+          )}
         </div>
 
         {loading ? (
@@ -258,13 +267,15 @@ export default function Attendance() {
                             </p>
                           </div>
                           <span className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${meta.chip}`}>{meta.label}</span>
-                          <button
-                            onClick={() => handleDelete(record.id)}
-                            className="opacity-0 group-hover:opacity-100 text-rose-400 hover:text-rose-600 transition-opacity"
-                            title="Delete attendance record"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          {(role === "teacher" || role === "admin") && (
+                            <button
+                              onClick={() => handleDelete(record.id)}
+                              className="opacity-0 group-hover:opacity-100 text-rose-400 hover:text-rose-600 transition-opacity"
+                              title="Delete attendance record"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
                       );
                     })
@@ -276,8 +287,7 @@ export default function Attendance() {
         )}
 
         {showForm && (
-          <AttForm
-            subjects={subjects}
+          <TeacherRollCall
             onClose={() => setShowForm(false)}
             onSaved={() => {
               setShowForm(false);
@@ -298,111 +308,3 @@ function Stat({ label, value, cls }) {
     </div>
   );
 }
-
-function AttForm({ subjects, onClose, onSaved }) {
-  const [form, setForm] = useState({
-    subject_id: "",
-    date: new Date().toISOString().slice(0, 10),
-    status: "present",
-    notes: "",
-  });
-
-  const [saving, setSaving] = useState(false);
-
-  const inputCls =
-    "w-full rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400";
-
-  const submit = async (event) => {
-    event.preventDefault();
-
-    if (!form.subject_id || !form.date) {
-      return;
-    }
-
-    const subject = subjects.find((s) => s.id === form.subject_id);
-
-    try {
-      setSaving(true);
-      await api.createAttendanceRecord({
-        subject_id: form.subject_id,
-        session_title: subject?.name || "Untitled",
-        date: form.date,
-        status: form.status,
-        notes: form.notes,
-      });
-      onSaved();
-    } catch (error) {
-      console.error("Failed to create attendance record:", error);
-      alert("Failed to save attendance record.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-lg rounded-3xl bg-card border border-border shadow-xl">
-        <div className="flex items-center justify-between p-6 border-b border-border">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Log attendance</h2>
-            <p className="text-sm text-muted-foreground mt-1">Record your attendance for a subject.</p>
-          </div>
-          <button type="button" onClick={onClose} className="p-2 rounded-xl hover:bg-muted transition-colors">
-            <XIcon className="w-5 h-5" />
-          </button>
-        </div>
-
-        <form onSubmit={submit} className="p-6 space-y-4">
-          <SubjectSelect
-            subjects={subjects}
-            value={form.subject_id}
-            onSelect={(id) => setForm({ ...form, subject_id: id })}
-            inputCls={inputCls}
-          />
-
-          <DatePicker
-            value={form.date}
-            onChange={(date) => setForm({ ...form, date })}
-          />
-
-          <div className="grid grid-cols-2 gap-2">
-            {Object.entries(STATUS_META).map(([key, meta]) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setForm({ ...form, status: key })}
-                className={`py-2 rounded-2xl text-xs font-medium border transition-all ${
-                  form.status === key ? `${meta.cls} border-transparent` : "border-border text-muted-foreground hover:bg-[hsl(var(--muted))]"
-                }`}
-              >
-                {meta.label}
-              </button>
-            ))}
-          </div>
-
-          <input
-            className={inputCls}
-            placeholder="Notes (optional)"
-            value={form.notes}
-            onChange={(event) => setForm({ ...form, notes: event.target.value })}
-          />
-
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2.5 rounded-2xl border border-border text-sm font-medium hover:bg-muted transition-colors">
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-4 py-2.5 rounded-2xl bg-pink-500 text-white text-sm font-medium hover:bg-pink-600 disabled:opacity-50 transition-colors"
-            >
-              {saving ? "Saving…" : "Save entry"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-
