@@ -11,7 +11,7 @@ import { api } from "@/api/apiClient";
 import AppShell from "@/components/layout/AppShell";
 import AttendanceRing from "@/components/dashboard/AttendanceRing";
 import DatePicker from "@/components/shared/DatePicker";
-import TeacherRollCall from "@/components/attendance/TeacherRollCall";
+import TeacherRollCall from "@/components/attendance/teacherRollCall";
 import { computeAttendance } from "@/lib/studentUtils";
 
 const STATUS_META = {

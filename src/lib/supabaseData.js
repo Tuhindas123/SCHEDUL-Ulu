@@ -277,6 +277,34 @@ async function unenroll(enrollmentId) {
   return { ok: true };
 }
 
+// ============ ERP: pre-assigned roles (add someone before they've ever logged in) ============
+
+async function listRoleDirectory() {
+  const { data, error } = await supabase
+    .from("role_directory")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+async function addRoleDirectoryEntry(email, role, fullName) {
+  const added_by = await currentUserId();
+  const { data, error } = await supabase
+    .from("role_directory")
+    .upsert({ email: email.trim().toLowerCase(), role, full_name: fullName || null, added_by })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+async function removeRoleDirectoryEntry(email) {
+  const { error } = await supabase.from("role_directory").delete().eq("email", email);
+  if (error) throw error;
+  return { ok: true };
+}
+
 export const supabaseData = {
   listRows,
   createRow,
@@ -296,4 +324,7 @@ export const supabaseData = {
   getEnrollmentsForSection,
   enrollStudent,
   unenroll,
+  listRoleDirectory,
+  addRoleDirectoryEntry,
+  removeRoleDirectoryEntry,
 };

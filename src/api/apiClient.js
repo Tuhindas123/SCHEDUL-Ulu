@@ -65,4 +65,8 @@ export const api = {
   getEnrollmentsForSection: (sectionId) => supabaseData.getEnrollmentsForSection(sectionId),
   enrollStudent: (sectionId, userId) => supabaseData.enrollStudent(sectionId, userId),
   unenroll: (enrollmentId) => supabaseData.unenroll(enrollmentId),
+  listRoleDirectory: () => supabaseData.listRoleDirectory(),
+  addRoleDirectoryEntry: (email, role, fullName) =>
+    supabaseData.addRoleDirectoryEntry(email, role, fullName),
+  removeRoleDirectoryEntry: (email) => supabaseData.removeRoleDirectoryEntry(email),
 };

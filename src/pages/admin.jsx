@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Users, BookOpen, UserPlus, Trash2, ShieldAlert } from "lucide-react";
 
 import { api } from "@/api/apiClient";
+import { classifyEmail } from "@/lib/emailClassifier";
 import AppShell from "@/components/layout/AppShell";
 
 const inputCls =
@@ -94,15 +95,44 @@ export default function Admin() {
 }
 
 // ============ PEOPLE (admin only) ============
+const SUBTABS = [
+  { key: "teacher", label: "Faculty" },
+  { key: "student", label: "Students" },
+  { key: "admin", label: "Office / Admin" },
+];
+
+function Avatar({ name, url }) {
+  if (url) return <img src={url} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" />;
+  const initials = (name || "?").trim().slice(0, 1).toUpperCase();
+  return (
+    <div className="w-10 h-10 rounded-full bg-pink-100 text-pink-700 grid place-items-center font-semibold shrink-0">
+      {initials}
+    </div>
+  );
+}
+
 function PeopleTab() {
+  const [subtab, setSubtab] = useState("teacher");
   const [people, setPeople] = useState([]);
+  const [pending, setPending] = useState([]);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState(null);
+
+  // add-by-email form state
+  const [email, setEmail] = useState("");
+  const [guessedRole, setGuessedRole] = useState(null);
+  const [guessReason, setGuessReason] = useState("");
+  const [chosenRole, setChosenRole] = useState("student");
+  const [adding, setAdding] = useState(false);
 
   const load = async () => {
     try {
       setLoading(true);
-      setPeople(await api.listAllProfiles());
+      const [profiles, directory] = await Promise.all([api.listAllProfiles(), api.listRoleDirectory()]);
+      setPeople(profiles);
+      // "pending" = pre-registered by email but nobody with that email has logged in yet
+      const activeEmails = new Set(profiles.map((p) => p.email).filter(Boolean));
+      setPending(directory.filter((d) => !activeEmails.has(d.email)));
     } catch (err) {
       console.error("Failed to load people:", err);
     } finally {
@@ -125,32 +155,136 @@ function PeopleTab() {
     }
   };
 
+  const onEmailChange = (value) => {
+    setEmail(value);
+    const guess = classifyEmail(value);
+    setGuessedRole(guess.role);
+    setGuessReason(guess.reason);
+    if (guess.role) setChosenRole(guess.role);
+  };
+
+  const addByEmail = async () => {
+    if (!email.trim()) return;
+    try {
+      setAdding(true);
+      await api.addRoleDirectoryEntry(email, chosenRole);
+      setEmail(""); setGuessedRole(null); setGuessReason(""); setChosenRole("student");
+      await load();
+    } catch (err) {
+      console.error("Failed to add person:", err);
+      alert("Couldn't add that email. Check it's a valid address and try again.");
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const removePending = async (email) => {
+    try { await api.removeRoleDirectoryEntry(email); await load(); }
+    catch (err) { console.error("Failed to remove:", err); }
+  };
+
   if (loading) return <p className="text-sm text-muted-foreground py-10 text-center">Loading people…</p>;
 
+  const shown = people.filter((p) => p.role === subtab);
+  const shownPending = pending.filter((p) => p.role === subtab);
+
   return (
-    <div className="rounded-3xl bg-card border border-border/60 shadow-sm divide-y divide-border/40">
-      {people.length === 0 ? (
-        <p className="text-sm text-muted-foreground py-10 text-center">No profiles found yet.</p>
-      ) : (
-        people.map((person) => (
-          <div key={person.user_id} className="flex items-center justify-between gap-3 px-5 py-3.5">
-            <div className="min-w-0">
-              <p className="font-medium text-foreground truncate">{person.full_name || "Unnamed"}</p>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ROLE_CHIP[person.role]}`}>{person.role}</span>
+    <div className="space-y-5">
+      {/* Add by email */}
+      <div className="rounded-3xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
+        <p className="text-sm font-medium text-foreground">Add a person by email</p>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input
+            className={inputCls}
+            placeholder="e.g. bam25058@tezu.ac.in"
+            value={email}
+            onChange={(e) => onEmailChange(e.target.value)}
+          />
+          <select
+            className="rounded-2xl border border-border bg-background px-3.5 py-2.5 text-sm"
+            value={chosenRole}
+            onChange={(e) => setChosenRole(e.target.value)}
+          >
+            <option value="student">student</option>
+            <option value="teacher">teacher</option>
+            <option value="admin">admin</option>
+          </select>
+          <button
+            className="rounded-2xl bg-pink-600 text-white px-4 py-2.5 text-sm font-medium disabled:opacity-50"
+            disabled={adding || !email.trim()}
+            onClick={addByEmail}
+          >
+            {adding ? "Adding…" : "Add"}
+          </button>
+        </div>
+        {email && (
+          <p className="text-xs text-muted-foreground">
+            {guessedRole ? `Guessed role: ${guessedRole}. ` : ""}{guessReason} They'll get this role automatically the first time they sign in.
+          </p>
+        )}
+      </div>
+
+      {/* Sub-tabs */}
+      <div className="flex gap-2">
+        {SUBTABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setSubtab(t.key)}
+            className={`px-4 py-2 rounded-2xl text-sm font-medium transition-colors ${
+              subtab === t.key ? "bg-pink-600 text-white" : "bg-card border border-border/60 text-muted-foreground"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Pending (registered by email, not yet logged in) */}
+      {shownPending.length > 0 && (
+        <div className="rounded-3xl bg-amber-50 border border-amber-200 divide-y divide-amber-200">
+          <p className="px-5 py-2.5 text-xs font-semibold text-amber-700">Waiting for first login</p>
+          {shownPending.map((p) => (
+            <div key={p.email} className="flex items-center justify-between gap-3 px-5 py-3">
+              <div className="min-w-0">
+                <p className="font-medium text-foreground truncate">{p.full_name || p.email}</p>
+                <p className="text-xs text-muted-foreground truncate">{p.email}</p>
+              </div>
+              <button className="text-xs text-amber-700 hover:underline" onClick={() => removePending(p.email)}>
+                Remove
+              </button>
             </div>
-            <select
-              className="rounded-xl border border-border bg-background px-3 py-1.5 text-sm"
-              value={person.role}
-              disabled={savingId === person.user_id}
-              onChange={(e) => changeRole(person.user_id, e.target.value)}
-            >
-              <option value="student">student</option>
-              <option value="teacher">teacher</option>
-              <option value="admin">admin</option>
-            </select>
-          </div>
-        ))
+          ))}
+        </div>
       )}
+
+      {/* Registered people in this sub-tab */}
+      <div className="rounded-3xl bg-card border border-border/60 shadow-sm divide-y divide-border/40">
+        {shown.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-10 text-center">Nobody here yet.</p>
+        ) : (
+          shown.map((person) => (
+            <div key={person.user_id} className="flex items-center justify-between gap-3 px-5 py-3.5">
+              <div className="flex items-center gap-3 min-w-0">
+                <Avatar name={person.full_name} url={person.avatar_url} />
+                <div className="min-w-0">
+                  <p className="font-medium text-foreground truncate">{person.full_name || "Unnamed"}</p>
+                  <p className="text-xs text-muted-foreground truncate">{person.email}</p>
+                </div>
+              </div>
+              <select
+                className="rounded-xl border border-border bg-background px-3 py-1.5 text-sm"
+                value={person.role}
+                disabled={savingId === person.user_id}
+                onChange={(e) => changeRole(person.user_id, e.target.value)}
+              >
+                <option value="student">student</option>
+                <option value="teacher">teacher</option>
+                <option value="admin">admin</option>
+              </select>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }

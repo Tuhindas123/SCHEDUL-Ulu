@@ -8,6 +8,7 @@ import { supabase } from "./lib/supabaseClient";
 import LoadingScreen from "./components/LoadingScreen";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
+import RoleHome from "./pages/RoleHome";
 import Attendance from "./pages/Attendance";
 import Schedule from "./pages/Schedule";
 import Settings from "./pages/Settings";
@@ -15,7 +16,7 @@ import WeeklyPlan from "./pages/WeeklyPlan";
 import SubjectAttendance from "./pages/SubjectAttendance";
 import Feedback from "./pages/Feedback";
 import About from "./pages/About";
-import Admin from "./pages/Admin";
+import Admin from "./pages/admin";
 
 const routerBase = Capacitor.isNativePlatform() || import.meta.env.DEV || import.meta.env.VITE_HOST_ENV === 'cloudflare'
   ? '/'
@@ -76,7 +77,7 @@ function App() {
     <Router basename={routerBase}>
       <Routes>
         <Route path="/login" element={!session ? <Login /> : <Navigate to="/" />} />
-        <Route path="/" element={session ? <Home /> : <Navigate to="/login" />} />
+        <Route path="/" element={session ? <RoleHome /> : <Navigate to="/login" />} />
         <Route path="/attendance" element={session ? <Attendance /> : <Navigate to="/login" />} />
         
         <Route
