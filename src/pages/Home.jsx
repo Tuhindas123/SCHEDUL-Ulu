@@ -40,7 +40,7 @@ export default function Home() {
         setLoading(true);
 
         const [s, r, p, st, session] = await Promise.all([
-          api.getClassSessions(),
+          api.getMyClassSessions(),
           api.getAttendanceRecords(),
           api.getWeeklyPlans(),
           api.getSyncSettings(),

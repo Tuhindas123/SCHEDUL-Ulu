@@ -2,6 +2,7 @@ import { supabaseData } from "@/lib/supabaseData";
 
 export const api = {
   // CLASS SESSIONS
+  getMyClassSessions: () => supabaseData.getMyClassSessions(),
   getClassSessions: () => supabaseData.listRows("ClassSession", { column: "start_time" }),
   createClassSession: (data) => supabaseData.createRow("ClassSession", data),
   updateClassSession: (id, data) => supabaseData.updateRow("ClassSession", id, data),

@@ -7,7 +7,6 @@ import {
   ListTodo,
   Settings,
   Sparkles,
-  UtensilsCrossed,
   ShieldCheck,
   Menu,
   X,
@@ -15,9 +14,6 @@ import {
 import { usePreviewRole } from "@/contexts/PreviewRoleContext";
 import { PreviewRoleSwitcher, PreviewRoleBanner } from "@/components/layout/PreviewRoleSwitcher";
 
-// Shared grouped nav — used by both the desktop sidebar and the
-// mobile slide-out menu. Add new items to an existing group, or add
-// a new { section: "Name", items: [...] } block for a new group.
 function navGroups(role) {
   return [
     {
@@ -32,16 +28,6 @@ function navGroups(role) {
         { to: "/weekly-plan", label: "Plan", icon: ListTodo },
       ],
     },
-    {
-      section: "Essentials",
-      items: [
-        { to: "/restaurants", label: "Eats", icon: UtensilsCrossed },
-        // Add future items here, e.g.:
-        // { to: "/medicines", label: "Medicines", icon: Pill },
-      ],
-    },
-    // Only teachers/admins get the Admin link — students never see a
-    // dead-end nav item, even though the page itself also gates by role.
     ...(role === "teacher" || role === "admin"
       ? [{ section: "Manage", items: [{ to: "/admin", label: "Admin", icon: ShieldCheck }] }]
       : []),
@@ -82,8 +68,6 @@ function SidebarLink({ to, label, icon: Icon, end }) {
   );
 }
 
-// Mobile slide-out row — plain text list, Supabase-panel style:
-// no rounded pill, thin bottom border feel via parent spacing.
 function DrawerLink({ to, label, icon: Icon, end, onNavigate }) {
   return (
     <NavLink
@@ -113,7 +97,6 @@ export default function AppShell({ children }) {
   return (
     <div className="min-h-screen bg-[hsl(var(--background))]">
       <div className="flex flex-col lg:flex-row max-w-7xl mx-auto lg:gap-6 lg:p-6">
-        {/* Sidebar — desktop only */}
         <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:min-h-[calc(100vh-3rem)] lg:sticky lg:top-6 shrink-0 rounded-[2rem] bg-sidebar text-sidebar-foreground overflow-hidden">
           <div className="px-6 pt-7 pb-4">
             <div className="flex items-center gap-2.5">
@@ -160,7 +143,6 @@ export default function AppShell({ children }) {
           </div>
         </aside>
 
-        {/* Mobile top bar — sticky, with hamburger trigger */}
         <header className="lg:hidden sticky top-0 z-40 flex items-center justify-between gap-2 px-4 py-3 bg-[hsl(var(--background))]/90 backdrop-blur-md border-b border-border/60">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-sidebar text-white grid place-items-center">
@@ -178,14 +160,11 @@ export default function AppShell({ children }) {
           </button>
         </header>
 
-        {/* Main */}
         <main className="flex-1 min-w-0 px-4 lg:px-0 pb-8 pt-4 lg:pt-0">
           <PreviewRoleBanner />
           {children}
         </main>
 
-        {/* Mobile slide-out menu — Supabase-panel style: dark bg,
-            small uppercase section labels, thin dividers between groups */}
         {menuOpen && (
           <div className="lg:hidden fixed inset-0 z-50 flex justify-end">
             <div
