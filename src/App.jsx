@@ -4,6 +4,7 @@ import { App as CapApp } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
 import { Capacitor } from "@capacitor/core";
 import { supabase } from "./lib/supabaseClient";
+import Legal from "./pages/Legal";
 
 import LoadingScreen from "./components/LoadingScreen";
 import Login from "./pages/Login";
@@ -83,7 +84,8 @@ function App() {
         <Route path="/login" element={!session ? <Login /> : <Navigate to="/" />} />
         <Route path="/" element={session ? <Home /> : <Navigate to="/login" />} />
         <Route path="/attendance" element={session ? <Attendance /> : <Navigate to="/login" />} />
-        
+        <Route path="/about" element={session ? <About /> : <Navigate to="/login" />} />
+        <Route path="/legal" element={session ? <Legal /> : <Navigate to="/login" />} />
         <Route
           path="/attendance/:subjectKey"
           element={session ? <SubjectAttendance /> : <Navigate to="/login" />}

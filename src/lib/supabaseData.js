@@ -79,7 +79,7 @@ async function getMyProfile() {
   const { data, error } = await supabase
     .from("profiles")
     .select("*")
-    .eq("id", user_id)
+    .eq("user_id", user_id)
     .single();
   if (error) throw error;
   return data;

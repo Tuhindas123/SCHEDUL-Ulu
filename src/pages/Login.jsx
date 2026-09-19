@@ -14,6 +14,8 @@ const WORDMARK_FONT = '"Rubik", system-ui, sans-serif';
 
 /* ------------------------------------------------------------------ */
 /*  How the artwork works                                              */
+/* ------------------------------------------------------------------ */
+/*  How the artwork works                                              */
 /*                                                                     */
 /*  - Regular users only see two static files from /public:            */
 /*      login-halftone.png       (light mode)                          */
