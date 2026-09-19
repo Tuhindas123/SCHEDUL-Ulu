@@ -22,11 +22,8 @@
     "@capacitor/filesystem": "^8.1.2",
     "@capacitor/share": "^8.0.1",
     "@capacitor/splash-screen": "^8.0.2",
-<<<<<<< HEAD
-    "@fontsource/rubik": "^5.3.0",
-=======
     "@codetrix-studio/capacitor-google-auth": "^3.4.0-rc.4",
->>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
+    "@fontsource/rubik": "^5.3.0",
     "@hello-pangea/dnd": "^17.0.0",
     "@hookform/resolvers": "^4.1.2",
     "@radix-ui/react-accordion": "^1.2.3",

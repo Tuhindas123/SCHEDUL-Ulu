@@ -300,20 +300,10 @@ export default function Home() {
     loadDashboard();
   }, [loadDashboard]);
 
-<<<<<<< HEAD
   // Full-bleed: cancel the padding AppShell puts around the page so the dashboard
   // fills the whole content area (and its background reaches every edge).
   const pageRef = useRef(null);
   const [bleed, setBleed] = useState(null);
-=======
-        const [s, r, p, st, session] = await Promise.all([
-          api.getMyClassSessions(),
-          api.getAttendanceRecords(),
-          api.getWeeklyPlans(),
-          api.getSyncSettings(),
-          getSession(),
-        ]);
->>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
 
   useLayoutEffect(() => {
     const el = pageRef.current;

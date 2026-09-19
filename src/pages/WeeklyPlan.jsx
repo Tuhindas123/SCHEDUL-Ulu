@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Trash2, X, Check, Circle, Loader2, SkipForward, ChevronLeft, ChevronRight } from "lucide-react";
+import { Trash2, X, Check, Circle, Loader2, SkipForward, ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
 import { api } from "@/api/apiClient";
 import AppShell from "@/components/layout/AppShell";
 import { toDateString, getWeekStart } from "@/lib/studentUtils";
@@ -14,22 +14,42 @@ const CATEGORY_LABELS = {
 };
 
 const STATUS_META = {
-  planned: { icon: Circle, cls: "text-slate-400", chip: "bg-slate-100 text-slate-600", label: "Planned" },
-  in_progress: { icon: Loader2, cls: "text-amber-500", chip: "bg-amber-100 text-amber-700", label: "In progress" },
-  done: { icon: Check, cls: "text-teal-500", chip: "bg-teal-100 text-teal-700", label: "Done" },
-  skipped: { icon: SkipForward, cls: "text-rose-400", chip: "bg-rose-100 text-rose-700", label: "Skipped" },
+  planned: {
+    icon: Circle,
+    cls: "text-slate-400 dark:text-muted-foreground",
+    chip: "bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-muted-foreground",
+    label: "Planned",
+  },
+  in_progress: {
+    icon: Loader2,
+    cls: "text-amber-500 dark:text-amber-400",
+    chip: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
+    label: "In progress",
+  },
+  done: {
+    icon: Check,
+    cls: "text-teal-500 dark:text-teal-400",
+    chip: "bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300",
+    label: "Done",
+  },
+  skipped: {
+    icon: SkipForward,
+    cls: "text-rose-400 dark:text-rose-400",
+    chip: "bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300",
+    label: "Skipped",
+  },
 };
 
 const PRIORITY_CHIP = {
-  low: "bg-slate-100 text-slate-600",
-  medium: "bg-amber-100 text-amber-700",
-  high: "bg-rose-100 text-rose-700",
+  low: "bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-muted-foreground",
+  medium: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
+  high: "bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300",
 };
 
 const PRIORITY_DOT = {
-  low: "bg-slate-400",
-  medium: "bg-amber-500",
-  high: "bg-rose-500",
+  low: "bg-slate-400 dark:bg-muted-foreground",
+  medium: "bg-amber-500 dark:bg-amber-400",
+  high: "bg-rose-500 dark:bg-rose-400",
 };
 
 function eventDateFor(plan) {
@@ -51,6 +71,26 @@ function getMonthMatrix(year, month) {
 }
 
 const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function StatPill({ label, value, tone = "default" }) {
+  const tones = {
+    default: "bg-card border-border/60",
+    accent: "bg-pink-500 text-white border-transparent dark:bg-pink-600",
+    warn: "bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950 dark:border-rose-900 dark:text-rose-300",
+  };
+  return (
+    <div className={`rounded-2xl border shadow-sm px-5 py-3 ${tones[tone]}`}>
+      <p
+        className={`text-[11px] font-medium uppercase tracking-wide ${
+          tone === "default" ? "text-muted-foreground" : "opacity-80"
+        }`}
+      >
+        {label}
+      </p>
+      <p className="text-xl font-bold mt-0.5">{value}</p>
+    </div>
+  );
+}
 
 function MonthCalendar({ plans, currentMonth, onMonthChange, selectedDate, onSelectDate }) {
   const year = currentMonth.getFullYear();
@@ -79,19 +119,19 @@ function MonthCalendar({ plans, currentMonth, onMonthChange, selectedDate, onSel
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => onMonthChange(new Date(year, month - 1, 1))}
-            className="p-1.5 rounded-xl hover:bg-muted transition-colors"
+            className="p-1.5 rounded-xl hover:bg-muted dark:hover:bg-white/5 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => onMonthChange(new Date())}
-            className="px-2.5 py-1 rounded-xl text-xs font-medium hover:bg-muted transition-colors"
+            className="px-2.5 py-1 rounded-xl text-xs font-medium hover:bg-muted dark:hover:bg-white/5 transition-colors"
           >
             Today
           </button>
           <button
             onClick={() => onMonthChange(new Date(year, month + 1, 1))}
-            className="p-1.5 rounded-xl hover:bg-muted transition-colors"
+            className="p-1.5 rounded-xl hover:bg-muted dark:hover:bg-white/5 transition-colors"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -120,9 +160,9 @@ function MonthCalendar({ plans, currentMonth, onMonthChange, selectedDate, onSel
               onClick={() => onSelectDate(isSelected ? null : dateStr)}
               className={`relative aspect-square rounded-xl flex flex-col items-center justify-start pt-1.5 gap-1 transition-colors ${
                 isSelected
-                  ? "bg-pink-500 text-white"
+                  ? "bg-pink-500 dark:bg-pink-600 text-white"
                   : isToday
-                  ? "bg-pink-100 text-pink-700"
+                  ? "bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-300"
                   : inMonth
                   ? "hover:bg-[hsl(var(--muted))] text-foreground"
                   : "text-muted-foreground/40 hover:bg-[hsl(var(--muted))]"
@@ -185,6 +225,19 @@ export default function WeeklyPlan() {
   const filtered =
     filter === "all" ? dateFiltered : dateFiltered.filter((p) => p.status === filter);
 
+  // ---- Derived stats ----
+  const todayStr = toDateString(new Date());
+  const stats = useMemo(() => {
+    const open = plans.filter((p) => p.status !== "done" && p.status !== "skipped");
+    const overdue = open.filter((p) => {
+      const d = eventDateFor(p);
+      return d && d < todayStr;
+    });
+    const dueToday = plans.filter((p) => eventDateFor(p) === todayStr);
+    const done = plans.filter((p) => p.status === "done");
+    return { open: open.length, overdue: overdue.length, dueToday: dueToday.length, done: done.length };
+  }, [plans, todayStr]);
+
   const handleDelete = async (id) => {
     try {
       await api.deleteWeeklyPlan(id);
@@ -218,12 +271,32 @@ export default function WeeklyPlan() {
 
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-500 text-white font-medium shadow-lg shadow-pink-500/25 hover:bg-pink-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-500 dark:bg-pink-600 text-white font-medium shadow-lg shadow-pink-500/25 hover:bg-pink-600 dark:hover:bg-pink-700 transition-colors"
           >
             <span className="text-lg">+</span>
             Add plan
           </button>
         </div>
+
+        {!loading && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <StatPill label="Open items" value={stats.open} tone="accent" />
+            <StatPill label="Due today" value={stats.dueToday} />
+            <StatPill
+              label="Overdue"
+              value={stats.overdue}
+              tone={stats.overdue > 0 ? "warn" : "default"}
+            />
+            <StatPill label="Completed" value={stats.done} />
+          </div>
+        )}
+
+        {stats.overdue > 0 && !loading && (
+          <div className="flex items-center gap-2.5 rounded-2xl border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/50 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            You have {stats.overdue} overdue item{stats.overdue === 1 ? "" : "s"} that still need{stats.overdue === 1 ? "s" : ""} attention.
+          </div>
+        )}
 
         {loading ? (
           <div className="flex justify-center py-20">
@@ -253,7 +326,7 @@ export default function WeeklyPlan() {
                     onClick={() => setFilter(key)}
                     className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors ${
                       filter === key
-                        ? "bg-pink-500 text-white"
+                        ? "bg-pink-500 dark:bg-pink-600 text-white"
                         : "bg-card border border-border/60 text-muted-foreground hover:bg-[hsl(var(--muted))]"
                     }`}
                   >
@@ -265,7 +338,7 @@ export default function WeeklyPlan() {
               {selectedDate && (
                 <button
                   onClick={() => setSelectedDate(null)}
-                  className="text-xs text-pink-600 font-medium hover:underline"
+                  className="text-xs text-pink-600 dark:text-pink-400 font-medium hover:underline"
                 >
                   Showing {new Date(selectedDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · clear
                 </button>
@@ -282,6 +355,11 @@ export default function WeeklyPlan() {
                 filtered.map((plan) => {
                   const meta = STATUS_META[plan.status] || STATUS_META.planned;
                   const Icon = meta.icon;
+                  const isOverdue =
+                    plan.status !== "done" &&
+                    plan.status !== "skipped" &&
+                    eventDateFor(plan) &&
+                    eventDateFor(plan) < todayStr;
 
                   return (
                     <div key={plan.id} className="group flex items-start gap-3 px-5 py-3.5">
@@ -308,19 +386,26 @@ export default function WeeklyPlan() {
                           {plan.title}
                         </p>
 
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {plan.week_start_date
-                            ? `Week of ${new Date(plan.week_start_date).toLocaleDateString("en-US", {
+                        <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5 flex-wrap">
+                          {plan.week_start_date && (
+                            <span>
+                              Week of{" "}
+                              {new Date(plan.week_start_date).toLocaleDateString("en-US", {
                                 month: "short",
                                 day: "numeric",
-                              })}`
-                            : ""}
-                          {plan.due_date
-                            ? ` · Due ${new Date(plan.due_date).toLocaleDateString("en-US", {
+                              })}
+                            </span>
+                          )}
+                          {plan.due_date && (
+                            <span className={isOverdue ? "text-rose-500 dark:text-rose-400 font-medium" : ""}>
+                              {plan.week_start_date ? "· " : ""}
+                              {isOverdue ? "Overdue" : "Due"}{" "}
+                              {new Date(plan.due_date).toLocaleDateString("en-US", {
                                 month: "short",
                                 day: "numeric",
-                              })}`
-                            : ""}
+                              })}
+                            </span>
+                          )}
                         </p>
 
                         {plan.description && (
@@ -342,7 +427,7 @@ export default function WeeklyPlan() {
 
                       <button
                         onClick={() => handleDelete(plan.id)}
-                        className="opacity-0 group-hover:opacity-100 text-rose-400 hover:text-rose-600 transition-opacity shrink-0"
+                        className="opacity-0 group-hover:opacity-100 text-rose-400 hover:text-rose-600 dark:hover:text-rose-300 transition-opacity shrink-0"
                         title="Delete plan"
                       >
                         <Trash2 className="w-4 h-4" />
