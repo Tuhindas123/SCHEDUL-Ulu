@@ -2,6 +2,7 @@ import { supabaseData } from "@/lib/supabaseData";
 
 export const api = {
   // CLASS SESSIONS
+  getMyClassSessions: () => supabaseData.getMyClassSessions(),
   getClassSessions: () => supabaseData.listRows("ClassSession", { column: "start_time" }),
   createClassSession: (data) => supabaseData.createRow("ClassSession", data),
   updateClassSession: (id, data) => supabaseData.updateRow("ClassSession", id, data),
@@ -69,4 +70,15 @@ export const api = {
   addRoleDirectoryEntry: (email, role, fullName) =>
     supabaseData.addRoleDirectoryEntry(email, role, fullName),
   removeRoleDirectoryEntry: (email) => supabaseData.removeRoleDirectoryEntry(email),
+
+  // Assignments & Grading
+  createAssignment: (data) => supabaseData.createAssignment(data),
+  listAssignments: (sectionId) => supabaseData.listAssignments(sectionId),
+  submitAssignment: (assignmentId, studentId, contentUrl, submissionText) => 
+    supabaseData.submitAssignment(assignmentId, studentId, contentUrl, submissionText),
+  gradeSubmission: (submissionId, grade, feedback, graderId) => 
+    supabaseData.gradeSubmission(submissionId, grade, feedback, graderId),
+  getSubmissionsForAssignment: (assignmentId) => supabaseData.getSubmissionsForAssignment(assignmentId),
+  getMySubmissions: () => supabaseData.getMySubmissions(),
+
 };

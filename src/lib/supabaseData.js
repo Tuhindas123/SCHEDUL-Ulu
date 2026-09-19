@@ -88,6 +88,19 @@ async function getMyProfile() {
 // Teachers/admins get the sections they teach.
 // Students get the sections they're enrolled in (via the enrollments
 // -> sections foreign key, so Supabase can embed it in one query).
+async function getMyClassSessions() {
+  const sections = await getMySections();
+  if (!sections?.length) return [];
+  const sectionIds = sections.map((s) => s.id);
+  const { data, error } = await supabase
+    .from("class_sessions")
+    .select("*")
+    .in("section_id", sectionIds)
+    .order("start_time");
+  if (error) throw error;
+  return data || [];
+}
+
 async function getMySections() {
   const user_id = await currentUserId();
   const profile = await getMyProfile();
@@ -197,6 +210,32 @@ async function setUserRole(userId, role) {
 // getRoster() above: sections.teacher_id and profiles.user_id both
 // point at auth.users separately, with no direct FK between the two
 // tables for PostgREST to embed across.
+async function getSectionsForUser(userId) {
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("user_id", userId)
+    .single();
+  if (profileError) throw profileError;
+
+  if (profile.role === "teacher" || profile.role === "admin") {
+    const { data, error } = await supabase
+      .from("sections")
+      .select("*")
+      .eq("teacher_id", userId)
+      .order("name");
+    if (error) throw error;
+    return data || [];
+  }
+
+  const { data, error } = await supabase
+    .from("enrollments")
+    .select("sections(*)")
+    .eq("user_id", userId);
+  if (error) throw error;
+  return (data || []).map((row) => row.sections).filter(Boolean);
+}
+
 async function listAllSections() {
   const { data: sections, error } = await supabase
     .from("sections")
@@ -238,6 +277,14 @@ async function deleteSection(sectionId) {
 // returns profile info, for the read-only teacher roll-call screen).
 // Two-step, same reason as getRoster(): no direct FK from enrollments
 // to profiles for PostgREST to embed across.
+async function listAllEnrollments() {
+  const { data, error } = await supabase
+    .from("enrollments")
+    .select("id, user_id, section_id, sections(name)");
+  if (error) throw error;
+  return data || [];
+}
+
 async function getEnrollmentsForSection(sectionId) {
   const { data: enrollments, error } = await supabase
     .from("enrollments")

@@ -1,24 +1,16 @@
-import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import { api } from "@/api/apiClient";
 import Home from "@/pages/Home";
+import RoleDashboard from "@/pages/RoleDashboard";
 import LoadingScreen from "@/components/LoadingScreen";
+import { usePreviewRole } from "@/contexts/PreviewRoleContext";
 
-// Students land on the normal Home page. Teachers and admins are sent
-// straight to /admin, which already shows a different view per role
-// (teacher: their sections + roll-call; admin: people/sections/enrollments).
+// Students land on the normal Home page. Teachers and admins get their
+// own dashboard-style Home (RoleDashboard) instead of being redirected
+// away to /admin. Uses the shared effective role, so Preview-As-Student
+// correctly shows Home too.
 export default function RoleHome() {
-  const [role, setRole] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api.getMyProfile()
-      .then((p) => setRole(p?.role || "student"))
-      .catch(() => setRole("student"))
-      .finally(() => setLoading(false));
-  }, []);
+  const { effectiveRole, loading } = usePreviewRole();
 
   if (loading) return <LoadingScreen />;
-  if (role === "teacher" || role === "admin") return <Navigate to="/admin" />;
+  if (effectiveRole === "teacher" || effectiveRole === "admin") return <RoleDashboard />;
   return <Home />;
 }

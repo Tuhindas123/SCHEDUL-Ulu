@@ -6,44 +6,70 @@ import {
   CheckSquare,
   ListTodo,
   Settings,
-  Sparkles,
-  UtensilsCrossed,
+  Grid,
   ShieldCheck,
   Menu,
   X,
+  FileText,
 } from "lucide-react";
 import { usePreviewRole } from "@/contexts/PreviewRoleContext";
 import { PreviewRoleSwitcher, PreviewRoleBanner } from "@/components/layout/PreviewRoleSwitcher";
 
-// Shared grouped nav — used by both the desktop sidebar and the
-// mobile slide-out menu. Add new items to an existing group, or add
-// a new { section: "Name", items: [...] } block for a new group.
+const THEMES = {
+  student: {
+    bg: "bg-yellow-50 dark:bg-background",
+    sidebar: "bg-white dark:bg-card border-yellow-200 dark:border-border",
+    accent: "bg-pink-500 text-white hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700",
+    active: "bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-300",
+    text: "text-slate-700 dark:text-foreground/80",
+    accentIcon: "text-pink-500 dark:text-pink-400",
+    borderRadius: "rounded-3xl",
+    font: "font-medium",
+    logoBg: "bg-pink-500 dark:bg-pink-600"
+  },
+  teacher: {
+    bg: "bg-slate-50 dark:bg-background",
+    sidebar: "bg-white dark:bg-card border-slate-200 dark:border-border",
+    accent: "bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600",
+    active: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300",
+    text: "text-slate-600 dark:text-foreground/70",
+    accentIcon: "text-indigo-600 dark:text-indigo-400",
+    borderRadius: "rounded-2xl",
+    font: "font-normal",
+    logoBg: "bg-indigo-600 dark:bg-indigo-500"
+  },
+  admin: {
+    bg: "bg-slate-100 dark:bg-background",
+    sidebar: "bg-slate-900 text-slate-300 border-slate-800 dark:bg-sidebar-background dark:text-sidebar-foreground dark:border-sidebar-border",
+    accent: "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600",
+    active: "bg-blue-500 text-white dark:bg-blue-600",
+    text: "text-slate-400 dark:text-sidebar-foreground/70",
+    accentIcon: "text-blue-400 dark:text-blue-300",
+    borderRadius: "rounded-lg",
+    font: "font-normal",
+    logoBg: "bg-blue-600 dark:bg-blue-500"
+  }
+};
+
 function navGroups(role) {
   return [
     {
-      section: "General",
+      section: "Main",
       items: [{ to: "/", label: "Home", icon: LayoutDashboard, end: true }],
     },
     {
       section: "Academics",
       items: [
         { to: "/schedule", label: "Schedule", icon: CalendarDays },
-        { to: "/attendance", label: "Attend", icon: CheckSquare },
-        { to: "/weekly-plan", label: "Plan", icon: ListTodo },
+        { to: "/attendance", label: "Attendance", icon: CheckSquare },
+        { to: "/weekly-plan", label: "Planning", icon: ListTodo },
+        { to: "/assignments", label: "Assignments", icon: FileText },
+        { to: "/materials", label: "Materials", icon: FileText },
+        { to: "/leave", label: "Leave", icon: FileText },
       ],
     },
-    {
-      section: "Essentials",
-      items: [
-        { to: "/restaurants", label: "Eats", icon: UtensilsCrossed },
-        // Add future items here, e.g.:
-        // { to: "/medicines", label: "Medicines", icon: Pill },
-      ],
-    },
-    // Only teachers/admins get the Admin link — students never see a
-    // dead-end nav item, even though the page itself also gates by role.
     ...(role === "teacher" || role === "admin"
-      ? [{ section: "Manage", items: [{ to: "/admin", label: "Admin", icon: ShieldCheck }] }]
+      ? [{ section: "Administration", items: [{ to: "/admin", label: "Admin Panel", icon: ShieldCheck }] }]
       : []),
     {
       section: null,
@@ -52,54 +78,49 @@ function navGroups(role) {
   ];
 }
 
-function SidebarLink({ to, label, icon: Icon, end }) {
+function SidebarLink({ to, label, icon: Icon, end, theme }) {
   return (
     <NavLink
       to={to}
       end={end}
       className={({ isActive }) =>
-        `group flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-2xl text-sm font-medium whitespace-nowrap transition-all ${
+        `group flex items-center gap-3 px-4 py-2.5 ${theme.borderRadius} text-sm transition-all ${
           isActive
-            ? "bg-white/10 text-white"
-            : "text-sidebar-foreground/65 hover:bg-white/5 hover:text-white"
+            ? theme.active
+            : `${theme.text} hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-foreground`
         }`
       }
     >
       {({ isActive }) => (
         <>
-          <span className="flex items-center gap-2.5">
-            <Icon className="w-[18px] h-[18px] shrink-0" />
-            <span>{label}</span>
-          </span>
-          <span
-            className={`w-1.5 h-1.5 rounded-full bg-pastelPink transition-opacity ${
-              isActive ? "opacity-100" : "opacity-0"
-            }`}
-          />
+          <Icon className={`w-5 h-5 ${isActive ? theme.accentIcon : "text-slate-400 dark:text-muted-foreground"}`} />
+          <span className={theme.font}>{label}</span>
         </>
       )}
     </NavLink>
   );
 }
 
-// Mobile slide-out row — plain text list, Supabase-panel style:
-// no rounded pill, thin bottom border feel via parent spacing.
-function DrawerLink({ to, label, icon: Icon, end, onNavigate }) {
+function DrawerLink({ to, label, icon: Icon, end, onNavigate, theme }) {
   return (
     <NavLink
       to={to}
       end={end}
       onClick={onNavigate}
       className={({ isActive }) =>
-        `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-colors ${
+        `flex items-center gap-3 px-4 py-2.5 ${theme.borderRadius} text-sm transition-colors ${
           isActive
-            ? "bg-white/10 text-white font-medium"
-            : "text-sidebar-foreground/70 hover:bg-white/5 hover:text-white"
+            ? theme.active
+            : `${theme.text} hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-foreground`
         }`
       }
     >
-      <Icon className="w-[17px] h-[17px] shrink-0" />
-      <span>{label}</span>
+      {({ isActive }) => (
+        <>
+          <Icon className={`w-5 h-5 ${isActive ? theme.accentIcon : "text-slate-400 dark:text-muted-foreground"}`} />
+          <span className={theme.font}>{label}</span>
+        </>
+      )}
     </NavLink>
   );
 }
@@ -108,109 +129,112 @@ export default function AppShell({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { effectiveRole } = usePreviewRole();
 
+  const theme = THEMES[effectiveRole] || THEMES.teacher;
   const NAV_GROUPS = navGroups(effectiveRole);
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--background))]">
-      <div className="flex flex-col lg:flex-row max-w-7xl mx-auto lg:gap-6 lg:p-6">
-        {/* Sidebar — desktop only */}
-        <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:min-h-[calc(100vh-3rem)] lg:sticky lg:top-6 shrink-0 rounded-[2rem] bg-sidebar text-sidebar-foreground overflow-hidden">
-          <div className="px-6 pt-7 pb-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-2xl bg-pastelPink text-pastelPink-foreground grid place-items-center">
-                <Sparkles className="w-5 h-5" />
+    <div
+      className={`min-h-screen min-h-[100dvh] w-full ${theme.bg} font-sans text-slate-900 dark:text-foreground transition-colors duration-300`}
+    >
+      <div className="flex flex-col lg:flex-row max-w-[1600px] mx-auto lg:gap-0 lg:p-0 min-h-screen min-h-[100dvh]">
+        <aside
+          className={`hidden lg:flex lg:flex-col lg:w-64 lg:min-h-screen lg:sticky lg:top-0 shrink-0 ${theme.sidebar} border-r transition-all`}
+        >
+          <div className="px-6 py-6">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 ${theme.borderRadius} ${theme.logoBg} text-white grid place-items-center shadow-sm`}>
+                <Grid className="w-6 h-6" />
               </div>
-              <div>
-                <p className="font-heading font-bold text-white leading-tight">Schedul-Ulu</p>
-                <p className="text-[11px] text-sidebar-foreground/60 leading-tight">your week, in colour</p>
+              <div className="flex flex-col">
+                <p className="font-bold text-slate-900 dark:text-foreground leading-tight text-lg">Schedul-Ulu</p>
+                <p className="text-[11px] text-slate-500 dark:text-muted-foreground font-medium uppercase tracking-wider">
+                  University ERP
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="flex-1 px-4 pb-4 space-y-5">
+          <div className="flex-1 px-3 pb-4 space-y-6">
             {NAV_GROUPS.map((group, i) => (
-              <div key={group.section || `group-${i}`}>
+              <div key={group.section || `group-${i}`} className="space-y-1">
                 {group.section && (
-                  <p className="px-3.5 pt-2 pb-2 text-[11px] font-semibold text-sidebar-foreground/40">
+                  <p className="px-4 pb-2 text-[11px] font-bold text-slate-400 dark:text-muted-foreground uppercase tracking-widest">
                     {group.section}
                   </p>
                 )}
-                <nav className="flex flex-col gap-1">
+                <nav className="flex flex-col gap-0.5">
                   {group.items.map((item) => (
-                    <SidebarLink key={item.to} {...item} />
+                    <SidebarLink key={item.to} {...item} theme={theme} />
                   ))}
                 </nav>
               </div>
             ))}
           </div>
 
-          <div className="mt-auto p-4 space-y-3">
+          <div className="p-4 border-t border-slate-100 dark:border-border space-y-4">
             <PreviewRoleSwitcher />
-            <div className="rounded-2xl bg-white/5 p-4">
-              <p className="text-xs text-sidebar-foreground/60 leading-snug">
-                Keep your attendance on track, one class at a time.
+            <div
+              className={`rounded-2xl bg-white/50 dark:bg-white/5 p-4 border border-slate-100 dark:border-border ${theme.borderRadius}`}
+            >
+              <p className="text-xs text-slate-500 dark:text-muted-foreground leading-relaxed">
+                Institutional access enabled for {effectiveRole}.
               </p>
             </div>
             <Link
               to="/privacy"
-              className="block text-center text-[11px] text-sidebar-foreground/35 hover:text-sidebar-foreground/60 transition-colors py-1"
+              className="block text-center text-[11px] text-slate-400 dark:text-muted-foreground hover:text-slate-600 dark:hover:text-foreground transition-colors py-2"
             >
               Privacy Policy
             </Link>
           </div>
         </aside>
 
-        {/* Mobile top bar — sticky, with hamburger trigger */}
-        <header className="lg:hidden sticky top-0 z-40 flex items-center justify-between gap-2 px-4 py-3 bg-[hsl(var(--background))]/90 backdrop-blur-md border-b border-border/60">
+        <header className="lg:hidden sticky top-0 z-40 flex items-center justify-between gap-2 px-4 py-3 bg-white dark:bg-card border-b border-slate-200 dark:border-border">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-sidebar text-white grid place-items-center">
-              <Sparkles className="w-4 h-4" />
+            <div className={`w-8 h-8 ${theme.borderRadius} ${theme.logoBg} text-white grid place-items-center`}>
+              <Grid className="w-5 h-5" />
             </div>
-            <p className="font-heading font-bold text-foreground text-sm">Schedul-Ulu</p>
+            <p className="font-bold text-slate-900 dark:text-foreground text-sm">Schedul-Ulu</p>
           </div>
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
-            className="p-2 rounded-xl hover:bg-muted transition-colors"
+            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
             aria-label="Open menu"
           >
-            <Menu className="w-5 h-5 text-foreground" />
+            <Menu className="w-5 h-5 text-slate-600 dark:text-foreground" />
           </button>
         </header>
 
-        {/* Main */}
-        <main className="flex-1 min-w-0 px-4 lg:px-0 pb-8 pt-4 lg:pt-0">
+        <main className="flex-1 min-w-0 px-4 lg:px-8 pb-8 pt-6 lg:pt-8">
           <PreviewRoleBanner />
           {children}
         </main>
 
-        {/* Mobile slide-out menu — Supabase-panel style: dark bg,
-            small uppercase section labels, thin dividers between groups */}
         {menuOpen && (
           <div className="lg:hidden fixed inset-0 z-50 flex justify-end">
             <div
-              className="absolute inset-0 bg-black/50"
+              className="absolute inset-0 bg-slate-900/20 dark:bg-black/50 backdrop-blur-sm"
               onClick={() => setMenuOpen(false)}
             />
-            <div className="relative w-[78%] max-w-xs h-full bg-sidebar text-sidebar-foreground overflow-y-auto">
-              <div className="flex items-center justify-between px-5 py-5">
-                <p className="font-heading font-bold text-white">Menu</p>
+            <div className="relative w-[80%] max-w-xs h-full bg-white dark:bg-card border-l border-slate-200 dark:border-border overflow-y-auto shadow-2xl">
+              <div className="flex items-center justify-between px-6 py-6">
+                <p className="font-bold text-slate-900 dark:text-foreground text-lg">Menu</p>
                 <button
                   type="button"
                   onClick={() => setMenuOpen(false)}
-                  className="p-2 rounded-xl hover:bg-white/5 transition-colors"
+                  className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
                   aria-label="Close menu"
                 >
-                  <X className="w-5 h-5 text-white" />
+                  <X className="w-5 h-5 text-slate-600 dark:text-foreground" />
                 </button>
               </div>
 
               <div className="px-3 pb-4">
                 {NAV_GROUPS.map((group, i) => (
-                  <div key={group.section || `mgroup-${i}`}>
-                    {i > 0 && <div className="my-3 border-t border-white/10" />}
+                  <div key={group.section || `mgroup-${i}`} className="mb-6">
                     {group.section && (
-                      <p className="px-4 pt-1 pb-2 text-[10px] font-semibold tracking-wide uppercase text-sidebar-foreground/40">
+                      <p className="px-4 pb-2 text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-muted-foreground">
                         {group.section}
                       </p>
                     )}
@@ -220,6 +244,7 @@ export default function AppShell({ children }) {
                           key={item.to}
                           {...item}
                           onNavigate={() => setMenuOpen(false)}
+                          theme={theme}
                         />
                       ))}
                     </nav>
@@ -227,15 +252,15 @@ export default function AppShell({ children }) {
                 ))}
               </div>
 
-              <div className="px-4 pt-1">
+              <div className="px-6 py-6 border-t border-slate-100 dark:border-border">
                 <PreviewRoleSwitcher />
               </div>
 
-              <div className="mt-auto px-4 py-4 border-t border-white/10">
+              <div className="px-6 pb-8 text-center">
                 <Link
                   to="/privacy"
                   onClick={() => setMenuOpen(false)}
-                  className="block text-[11px] text-sidebar-foreground/40 hover:text-sidebar-foreground/70 transition-colors py-1"
+                  className="text-[11px] text-slate-400 dark:text-muted-foreground hover:text-slate-600 dark:hover:text-foreground transition-colors"
                 >
                   Privacy Policy
                 </Link>

@@ -17,6 +17,10 @@ import SubjectAttendance from "./pages/SubjectAttendance";
 import Feedback from "./pages/Feedback";
 import About from "./pages/About";
 import Admin from "./pages/admin";
+import TestRun from "./pages/TestRun";
+import Assignments from "./pages/Assignments";
+import Materials from "./pages/Materials";
+import Leave from "./pages/Leave";
 
 const routerBase = Capacitor.isNativePlatform() || import.meta.env.DEV || import.meta.env.VITE_HOST_ENV === 'cloudflare'
   ? '/'
@@ -77,7 +81,7 @@ function App() {
     <Router basename={routerBase}>
       <Routes>
         <Route path="/login" element={!session ? <Login /> : <Navigate to="/" />} />
-        <Route path="/" element={session ? <RoleHome /> : <Navigate to="/login" />} />
+        <Route path="/" element={session ? <Home /> : <Navigate to="/login" />} />
         <Route path="/attendance" element={session ? <Attendance /> : <Navigate to="/login" />} />
         
         <Route
@@ -91,6 +95,10 @@ function App() {
         <Route path="/feedback" element={session ? <Feedback /> : <Navigate to="/login" />} />
         <Route path="/about" element={session ? <About /> : <Navigate to="/login" />} />
         <Route path="/admin" element={session ? <Admin /> : <Navigate to="/login" />} />
+        <Route path="/assignments" element={session ? <Assignments /> : <Navigate to="/login" />} />
+        <Route path="/materials" element={session ? <Materials /> : <Navigate to="/login" />} />
+        <Route path="/leave" element={session ? <Leave /> : <Navigate to="/login" />} />
+        <Route path="/test-run" element={session ? <TestRun /> : <Navigate to="/login" />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

@@ -421,4 +421,3 @@ function SessionForm({ subjects, onClose, onSaved }) {
     </div>
   );
 }
-
