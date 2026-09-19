@@ -6,7 +6,11 @@ import {
   CheckSquare,
   ListTodo,
   Settings,
+<<<<<<< HEAD
   Grid,
+=======
+  Sparkles,
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
   ShieldCheck,
   Menu,
   X,
@@ -15,6 +19,7 @@ import {
 import { usePreviewRole } from "@/contexts/PreviewRoleContext";
 import { PreviewRoleSwitcher, PreviewRoleBanner } from "@/components/layout/PreviewRoleSwitcher";
 
+<<<<<<< HEAD
 const THEMES = {
   student: {
     bg: "bg-yellow-50 dark:bg-background",
@@ -51,6 +56,8 @@ const THEMES = {
   }
 };
 
+=======
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
 function navGroups(role) {
   return [
     {
@@ -101,7 +108,11 @@ function SidebarLink({ to, label, icon: Icon, end, theme }) {
   );
 }
 
+<<<<<<< HEAD
 function DrawerLink({ to, label, icon: Icon, end, onNavigate, theme }) {
+=======
+function DrawerLink({ to, label, icon: Icon, end, onNavigate }) {
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
   return (
     <NavLink
       to={to}
@@ -133,6 +144,7 @@ export default function AppShell({ children }) {
   const NAV_GROUPS = navGroups(effectiveRole);
 
   return (
+<<<<<<< HEAD
     <div
       className={`min-h-screen min-h-[100dvh] w-full ${theme.bg} font-sans text-slate-900 dark:text-foreground transition-colors duration-300`}
     >
@@ -144,6 +156,15 @@ export default function AppShell({ children }) {
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 ${theme.borderRadius} ${theme.logoBg} text-white grid place-items-center shadow-sm`}>
                 <Grid className="w-6 h-6" />
+=======
+    <div className="min-h-screen bg-[hsl(var(--background))]">
+      <div className="flex flex-col lg:flex-row max-w-7xl mx-auto lg:gap-6 lg:p-6">
+        <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:min-h-[calc(100vh-3rem)] lg:sticky lg:top-6 shrink-0 rounded-[2rem] bg-sidebar text-sidebar-foreground overflow-hidden">
+          <div className="px-6 pt-7 pb-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-2xl bg-pastelPink text-pastelPink-foreground grid place-items-center">
+                <Sparkles className="w-5 h-5" />
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
               </div>
               <div className="flex flex-col">
                 <p className="font-bold text-slate-900 dark:text-foreground leading-tight text-lg">Schedul-Ulu</p>
@@ -189,7 +210,11 @@ export default function AppShell({ children }) {
           </div>
         </aside>
 
+<<<<<<< HEAD
         <header className="lg:hidden sticky top-0 z-40 flex items-center justify-between gap-2 px-4 py-3 bg-white dark:bg-card border-b border-slate-200 dark:border-border">
+=======
+        <header className="lg:hidden sticky top-0 z-40 flex items-center justify-between gap-2 px-4 py-3 bg-[hsl(var(--background))]/90 backdrop-blur-md border-b border-border/60">
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
           <div className="flex items-center gap-2">
             <div className={`w-8 h-8 ${theme.borderRadius} ${theme.logoBg} text-white grid place-items-center`}>
               <Grid className="w-5 h-5" />
@@ -206,7 +231,11 @@ export default function AppShell({ children }) {
           </button>
         </header>
 
+<<<<<<< HEAD
         <main className="flex-1 min-w-0 px-4 lg:px-8 pb-8 pt-6 lg:pt-8">
+=======
+        <main className="flex-1 min-w-0 px-4 lg:px-0 pb-8 pt-4 lg:pt-0">
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
           <PreviewRoleBanner />
           {children}
         </main>

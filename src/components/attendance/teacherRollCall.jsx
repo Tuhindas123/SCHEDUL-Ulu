@@ -168,7 +168,7 @@ export default function TeacherRollCall({ onClose, onSaved }) {
               ) : roster.length === 0 ? (
                 <p className="text-sm text-muted-foreground py-4 text-center">No students enrolled in this section yet.</p>
               ) : (
-                <div className="rounded-2xl border border-border/60 divide-y divide-border/40 max-h-72 overflow-y-auto">
+                <div className="rounded-2xl border border-border/60 divide-y divide-border/40 max-h-[50vh] overflow-y-auto">
                   {roster.map((student) => (
                     <div key={student.user_id} className="flex items-center justify-between gap-3 px-4 py-2.5">
                       <p className="text-sm font-medium text-foreground truncate">{student.full_name || "Unnamed student"}</p>

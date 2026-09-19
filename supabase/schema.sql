@@ -1,10 +1,19 @@
 -- Schedul-Ulu ERP: Institutional Schema
+<<<<<<< HEAD
 -- Version: 1.2.0
 -- Description: Role-based ERP for TUMBA, Tezpur University (Phase 2: Academics)
+=======
+-- Version: 1.1.0
+-- Description: Role-based ERP for TUMBA, Tezpur University
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
 
 create extension if not exists "pgcrypto";
 
 -- ============ 1. PROFILES & ROLES ============
+<<<<<<< HEAD
+=======
+-- Profiles table stores the actual user data after they log in.
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
 create table if not exists profiles (
   id uuid primary key references auth.users on delete cascade,
   full_name text,
@@ -18,6 +27,11 @@ create table if not exists profiles (
 
 create index if not exists idx_profiles_role on profiles(role);
 
+<<<<<<< HEAD
+=======
+-- Role Directory for pre-registration. 
+-- Admin adds emails here BEFORE users sign up.
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
 create table if not exists role_directory (
   id uuid primary key default gen_random_uuid(),
   email text unique not null,
@@ -29,7 +43,11 @@ create table if not exists role_directory (
 -- ============ 2. ACADEMIC STRUCTURE ============
 create table if not exists sections (
   id uuid primary key default gen_random_uuid(),
+<<<<<<< HEAD
   name text not null,
+=======
+  name text not null, -- e.g., "BBA Semester 3 - Section A"
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
   department text default 'TUMBA',
   teacher_id uuid references profiles(id) on delete set null,
   created_at timestamptz default now()
@@ -46,12 +64,21 @@ create table if not exists enrollments (
 -- ============ 3. ATTENDANCE & NOTIFICATIONS ============
 create table if not exists attendance_records (
   id uuid primary key default gen_random_uuid(),
+<<<<<<< HEAD
   user_id uuid references profiles(id) on delete cascade,
   section_id uuid references sections(id) on delete cascade,
   date date not null default current_date,
   status text check (status in ('present', 'absent', 'late', 'excused')) not null,
   marked_by uuid references profiles(id),
   session_title text,
+=======
+  user_id uuid references profiles(id) on delete cascade, -- The student
+  section_id uuid references sections(id) on delete cascade,
+  date date not null default current_date,
+  status text check (status in ('present', 'absent', 'late', 'excused')) not null,
+  marked_by uuid references profiles(id), -- The teacher
+  session_title text, -- e.g., "Marketing Management - Lecture 4"
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
   created_at timestamptz default now()
 );
 
@@ -60,6 +87,7 @@ create index if not exists idx_attendance_section_date on attendance_records(sec
 create table if not exists notifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,
+<<<<<<< HEAD
   title text not null,
   body text not null,
   is_read boolean default false,
@@ -166,16 +194,86 @@ create policy "Admins manage all submissions" on submissions for all to authenti
 
 -- ============ 6. AUTOMATION (TRIGGERS) ============
 
+=======
+  title text not null,
+  body text not null,
+  is_read boolean default false,
+  created_at timestamptz default now()
+);
+
+-- ============ 4. ROW LEVEL SECURITY (RLS) ============
+
+alter table profiles enable row level security;
+alter table role_directory enable row level security;
+alter table sections enable row level security;
+alter table enrollments enable row level security;
+alter table attendance_records enable row level security;
+alter table notifications enable row level security;
+
+-- Profiles: Everyone can read profiles, but only Admins can edit them.
+create policy "Profiles are viewable by authenticated users" on profiles for select to authenticated using (true);
+create policy "Admins manage profiles" on profiles for all to authenticated using (
+  exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+);
+
+-- Role Directory: Only Admins can see or edit.
+create policy "Admins manage role directory" on role_directory for all to authenticated using (
+  exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+);
+
+-- Sections: Everyone can view, only Admins manage.
+create policy "Sections are viewable by all" on sections for select to authenticated using (true);
+create policy "Admins manage sections" on sections for all to authenticated using (
+  exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+);
+
+-- Enrollments: Students view their own, Teachers view their sections, Admins manage.
+create policy "View own enrollments" on enrollments for select to authenticated using (user_id = auth.uid());
+create policy "Teachers view section enrollments" on enrollments for select to authenticated using (
+  exists (select 1 from sections where id = enrollments.section_id and teacher_id = auth.uid())
+);
+create policy "Admins manage enrollments" on enrollments for all to authenticated using (
+  exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+);
+
+-- Attendance: Students view own, Teachers mark their sections, Admins manage all.
+create policy "Students view own attendance" on attendance_records for select to authenticated using (user_id = auth.uid());
+create policy "Teachers manage attendance for their sections" on attendance_records for all to authenticated using (
+  exists (select 1 from sections where id = attendance_records.section_id and teacher_id = auth.uid())
+);
+create policy "Admins manage all attendance" on attendance_records for all to authenticated using (
+  exists (select 1 from profiles where id = auth.uid() and role = 'admin')
+);
+
+-- Notifications: Only the recipient can see/read their notifications.
+create policy "Users view own notifications" on notifications for select to authenticated using (user_id = auth.uid());
+create policy "Users mark notifications as read" on notifications for update to authenticated using (user_id = auth.uid());
+create policy "Admins/Teachers can create notifications" on notifications for insert to authenticated using (
+  exists (select 1 from profiles where id = auth.uid() and role in ('admin', 'teacher'))
+);
+
+-- ============ 5. AUTOMATION (TRIGGERS) ============
+
+-- Function to handle new user signup
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
 create or replace function public.handle_new_user()
 returns trigger as $$
 declare
   dir_role text;
   dir_name text;
 begin
+<<<<<<< HEAD
+=======
+  -- 1. Check if the email exists in the role_directory
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
   select role, full_name into dir_role, dir_name 
   from public.role_directory 
   where email = new.email;
 
+<<<<<<< HEAD
+=======
+  -- 2. If found, use the pre-assigned role. Otherwise, default to 'student'.
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
   insert into public.profiles (id, full_name, role, email, avatar_url)
   values (
     new.id, 
@@ -193,6 +291,10 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
+<<<<<<< HEAD
+=======
+-- Function to automatically create notification when attendance is marked
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
 create or replace function public.notify_attendance_marked()
 returns trigger as $$
 begin
@@ -210,6 +312,10 @@ create trigger on_attendance_marked
   after insert on attendance_records
   for each row execute procedure public.notify_attendance_marked();
 
+<<<<<<< HEAD
+=======
+-- Function to update updated_at timestamp
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
 create or replace function update_updated_at_column()
 returns trigger as $$
 begin
@@ -222,8 +328,14 @@ create trigger set_profiles_updated_at
     before update on profiles
     for each row execute procedure update_updated_at_column();
 
+<<<<<<< HEAD
 -- ============ 7. REPORTING & VIEWS ============
 
+=======
+-- ============ 6. REPORTING & VIEWS ============
+
+-- View for Attendance Summary by Section
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
 create or replace view attendance_summary_by_section as
 select 
     s.name as section_name,
@@ -236,6 +348,7 @@ select
 from attendance_records a
 join sections s on a.section_id = s.id
 group by s.name, a.date;
+<<<<<<< HEAD
 
 
 -- ============ 8. STUDY MATERIALS ============
@@ -282,3 +395,5 @@ create policy "Admins/Teachers view all leave requests" on leave_requests for se
 create policy "Admins/Teachers update leave status" on leave_requests for update to authenticated using (
   exists (select 1 from profiles where id = auth.uid() and role in ('admin', 'teacher'))
 );
+=======
+>>>>>>> cf9c845c25a98d6c361620f4aa9e176b8d447e21
